@@ -1,15 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #FFF8F6;
   --foreground: #171717;
+  --primary: #DA2439;
+  --secondary: #FFFFFF;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-baloo: var(--font-baloo);
+  --font-baloo-2: var(--font-baloo-2);
+  --font-satoshi: var(--font-satoshi);
+}
+
+@utility section-container {
+  @apply max-w-[1480px] mx-auto;
+}
+
+@utility section-px {
+  @apply px-8 md:px-16;
 }
 
 @media (prefers-color-scheme: dark) {

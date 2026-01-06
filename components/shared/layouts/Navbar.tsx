@@ -1,0 +1,70 @@
+"use client"
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const navLinks = [
+  { name: "About", href: "/about" },
+  { name: "Products", href: "/products" },
+  { name: "Gallery", href: "/gallery" },
+  { name: "Services", href: "/services" },
+  { name: "Store", href: "/store" },
+  { name: "Contact", href: "/contact" },
+];
+
+export default function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <nav
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled
+        ? "bg-white/10 backdrop-blur-md border-b border-white/10"
+        : "bg-transparent"
+        }`}
+    >
+      <div className="max-w-[1480px] mx-auto px-8 md:px-16 h-[90px] flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="relative w-[184px] h-[54px]">
+          <Image
+            src="/Logo.svg"
+            alt="Article8 Media Logo"
+            fill
+            className="object-contain object-left"
+            priority
+          />
+        </Link>
+
+        {/* Links */}
+        <div className="hidden lg:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="font-satoshi font-medium text-base text-white hover:opacity-80 transition-opacity uppercase"
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
+
+        {/* Mobile Menu Trigger (Placeholder) */}
+        {/* We can add a mobile menu button here later if needed */}
+      </div>
+    </nav>
+  );
+}
