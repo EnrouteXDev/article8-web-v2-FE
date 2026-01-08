@@ -1,5 +1,6 @@
 import React from "react";
 import PageHero from "@/components/shared/PageHero";
+import ProjectStackingSection from "@/components/pages/projects/ProjectStackingSection";
 
 export default function Products() {
   return (
@@ -8,6 +9,9 @@ export default function Products() {
         title="Products"
         description="Wonder and enjoy the works we have done over the years"
       />
+
+      <ProjectStackingSection />
+
       {/* Additional Products Page Content will go here */}
     </main>
   );
