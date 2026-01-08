@@ -1,5 +1,6 @@
 import React from "react";
 import PageHero from "@/components/shared/PageHero";
+import StoreContent from "@/components/pages/store/StoreContent";
 
 export default function Store() {
   return (
@@ -8,6 +9,7 @@ export default function Store() {
         title="Store"
         description="Our selection of curated items for your space."
       />
+      <StoreContent />
       {/* Additional Store Page Content will go here */}
     </main>
   );
