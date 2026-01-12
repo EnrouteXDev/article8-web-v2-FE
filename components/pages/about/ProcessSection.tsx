@@ -12,29 +12,23 @@ interface ProcessStep {
 const steps: ProcessStep[] = [
   {
     id: "001",
-    title: "Discovery & Insight",
-    description: "We begin by listening understanding your lifestyle, needs, and the essence of your space.",
-    image: "/demo.jpg" // Using placeholder as planned
-  },
-  {
-    id: "001", // Intentional duplicate ID based on design screenshot? Or should be 002? Design shows 001 for all. I will Stick to design but maybe it's a placeholder in design. I'll make them unique in data but display what's requested. Actually, let's assume 001, 002, 003 for logical progression, but the screenshot shows 001 three times. I will use 001, 002, 003 as it is likely a design mock error, but I can also just follow the mock blindly. Let's do 001 all for now to match screenshot exactly, or maybe 001, 002, 003 is safer. The user said "Process... from meeting to unveiling", implying sequence. I will use sequential numbers.
-    title: "Discovery & Insight", // Screenshot shows identical content. I will use valid content if I can infer it, or just duplicate for now as per design image.
-    description: "We begin by listening understanding your lifestyle, needs, and the essence of your space.",
+    title: "Pre-Production",
+    description: "This is where the foundation of every project is built. During pre-production, we focus on defining the story, tone, and visual direction before animation begins.",
     image: "/demo.jpg"
   },
   {
-    id: "001",
-    title: "Discovery & Insight",
-    description: "We begin by listening understanding your lifestyle, needs, and the essence of your space.",
+    id: "002",
+    title: "Production",
+    description: "Production is where ideas are brought to life through animation and execution. At this stage, our team focuses on building, animating, and refining assets.",
+    image: "/demo.jpg"
+  },
+  {
+    id: "003",
+    title: "Post-Production",
+    description: "Post-production is where all elements come together to form the final experience. This stage focuses on polishing, enhancing, and finalizing the project.",
     image: "/demo.jpg"
   }
 ];
-
-// Correcting the data to be more realistic while keeping the structure, 
-// or should I stick to the screenshot exactly? 
-// The screenshot shows "001 Discovery & Insight" three times. 
-// I will stick to the screenshot's repetitive content for now as it's a direct reference, 
-// but I'll use unique keys.
 
 export default function ProcessSection() {
   return (
@@ -45,10 +39,10 @@ export default function ProcessSection() {
         <div className="flex flex-col gap-6">
           <SectionHeader
             smallHeader="Our Process"
-            mainHeader="A Clear, Thoughtful Design Journey"
+            mainHeader="A Thoughtful Animation Journey"
           />
           <p className="font-satoshi font-normal text-lg lg:text-2xl leading-relaxed text-primary max-w-4xl">
-            Our process, from the meeting to the unveiling, teamwork, and innovation.
+            Our process, from pre-production to finalizing the project, is rooted in storytelling and precision.
           </p>
         </div>
 

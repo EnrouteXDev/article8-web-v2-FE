@@ -10,18 +10,18 @@ interface GoalItem {
 const goals: GoalItem[] = [
   {
     id: "001",
-    title: "Our Goals",
-    description: "Our mission is to deliver emotionally resonant and functionally brilliant spaces."
+    title: "Our Vision",
+    description: "To build immersive animated worlds that resonate emotionally, reflect cultural depth, and stand the test of time."
   },
   {
     id: "002",
-    title: "Our Vision",
-    description: "Creating timeless interiors with purpose, precision, and personality."
+    title: "Our Mission",
+    description: "To create animation that prioritizes strong storytelling, intentional design, and meaningful collaboration, delivering work that feels grounded, deliberate, and human."
   },
   {
     id: "003",
-    title: "Our mission",
-    description: "To redefine interior design through thoughtful, lasting experiences."
+    title: "Our Goal",
+    description: "Our goal is to create original animated work that balances strong storytelling, intentional design, and emotional impact, while building a collaborative studio culture that values craft, learning, and long-term creative growth."
   }
 ];
 
@@ -33,11 +33,11 @@ export default function GoalsSection() {
         {/* Header */}
         <div className="flex flex-col gap-6">
           <SectionHeader
-            smallHeader="Our Goals"
-            mainHeader="Driven by purpose & principles."
+            smallHeader="Vision & Mission"
+            mainHeader="Driven by storytelling & craft."
           />
           <p className="font-satoshi font-normal text-lg lg:text-2xl leading-relaxed text-primary max-w-4xl">
-            Our mission is to deliver emotionally resonant and functionally brilliant spaces.
+            We are committed to creating work that resonates emotionally and stands the test of time.
           </p>
         </div>
 

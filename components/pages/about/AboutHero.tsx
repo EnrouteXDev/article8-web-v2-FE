@@ -26,12 +26,12 @@ export default function AboutHero() {
           </h1>
 
           {/* Description Paragraph */}
-          <div className="max-w-[397px]">
+          <div className="max-w-[450px]">
             <p
               className="text-white text-[24px] leading-tight"
               style={{ fontFamily: 'var(--font-baloo-2)' }}
             >
-              Discover the story of our studio where passion meets purpose and values
+              Building immersive animated worlds rooted in intention, culture, and craft.
             </p>
           </div>
         </div>

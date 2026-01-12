@@ -15,7 +15,9 @@ const navLinks = [
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const pathname = usePathname();
+  const isHomePage = pathname === "/";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,11 +32,32 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Listen for video player state changes (only on home page)
+  useEffect(() => {
+    if (!isHomePage) return;
+
+    const handleVideoStateChange = (event: CustomEvent) => {
+      setIsVideoPlaying(event.detail.isPlaying);
+    };
+
+    window.addEventListener('videoPlayerStateChange', handleVideoStateChange as EventListener);
+
+    return () => {
+      window.removeEventListener('videoPlayerStateChange', handleVideoStateChange as EventListener);
+    };
+  }, [isHomePage]);
+
+  // Determine if navbar should be hidden
+  const shouldHideNavbar = isHomePage && isVideoPlaying;
+
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled
-        ? "bg-white/10 backdrop-blur-md border-b border-white/10"
-        : "bg-transparent"
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${shouldHideNavbar
+          ? "opacity-0 pointer-events-none -translate-y-full"
+          : "opacity-100 translate-y-0"
+        } ${isScrolled
+          ? "bg-white/10 backdrop-blur-md border-b border-white/10"
+          : "bg-transparent"
         }`}
     >
       <div className="max-w-[1480px] mx-auto px-8 md:px-16 h-[90px] flex items-center justify-between">
