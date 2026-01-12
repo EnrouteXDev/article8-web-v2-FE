@@ -8,37 +8,18 @@ export default function VisionSection() {
         {/* Left Column: Text Content */}
         <div className="flex flex-col gap-8">
           <h2 className="font-baloo font-bold text-4xl lg:text-[56px] text-primary leading-tight">
-            Rooted in Clear Vision.
+            Crafting worlds with
             <br />
-            Driven by Detail.
+            intention and craft.
           </h2>
 
           <div className="flex flex-col gap-6 font-satoshi text-lg lg:text-[20px] text-primary font-normal leading-relaxed">
             <p>
-              Since day one, we've believed that spaces and people shape each other. What started as a small design studio has grown into a full-service interior design firm.
+              We are an animation studio focused on crafting visually rich, story-driven worlds rooted in intention, culture, and craft. We believe strong stories are built long before animation begins, and we treat every project as an opportunity to explore meaning, atmosphere, and emotion through thoughtful visual language.
             </p>
             <p>
-              Our passion for creativity, functionality, and craftsmanship drives every project. Every project we undertake is crafted with precision, attention to detail, and a deep understanding of our clients’ needs.
+              As a studio, we value patience in process, clarity in direction, and collaboration across disciplines. Every frame we work toward is shaped by the people behind it and the world we are building together.
             </p>
-          </div>
-
-          <div className="flex items-center gap-16 mt-4">
-            <div className="flex flex-col gap-1">
-              <span className="font-baloo font-bold text-4xl lg:text-[56px] text-primary">
-                8+
-              </span>
-              <span className="font-satoshi text-base text-primary/80">
-                Completed Projects
-              </span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="font-baloo font-bold text-4xl lg:text-[56px] text-primary">
-                20+
-              </span>
-              <span className="font-satoshi text-base text-primary/80">
-                Satisfied Clients
-              </span>
-            </div>
           </div>
         </div>
 

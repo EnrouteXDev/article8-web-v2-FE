@@ -14,7 +14,7 @@ export default function ProductCard({ name, price, image, stock }: ProductCardPr
   return (
     <div className="flex flex-col gap-4">
       {/* Image Container */}
-      <div className="relative w-full aspect-236/244 rounded-[16px] overflow-hidden group">
+      <div className="relative w-full aspect-236/244  overflow-hidden group">
         <Image
           src={image}
           alt={name}
@@ -27,7 +27,7 @@ export default function ProductCard({ name, price, image, stock }: ProductCardPr
         {/* Name and Add to Cart */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex flex-col">
-            <h4 className="font-satoshi text-primary text-[13px] leading-tight opacity-70">
+            <h4 className="font-baloo font-medium text-primary text-sm leading-tight opacity-70">
               {name}
             </h4>
             <span className="font-baloo font-bold text-primary text-[17px]">
@@ -35,9 +35,9 @@ export default function ProductCard({ name, price, image, stock }: ProductCardPr
             </span>
           </div>
 
-          <button className="px-8 h-[32px] bg-primary text-white rounded-full flex items-center gap-2 hover:bg-primary/90 transition-colors">
-            <ShoppingCart01Icon size={12} />
-            <span className="font-satoshi text-[13px] font-medium whitespace-nowrap">
+          <button className="px-2 h-[22px] bg-primary text-white rounded-[4px] flex items-center gap-2 hover:bg-primary/90 transition-colors">
+            <ShoppingCart01Icon size={13} />
+            <span className="font-baloo text-sm font-medium whitespace-nowrap">
               Add to cart
             </span>
           </button>
@@ -45,13 +45,13 @@ export default function ProductCard({ name, price, image, stock }: ProductCardPr
 
         {/* Stock Info */}
         {stock && (
-          <p className="font-satoshi text-[12px] text-primary/60 italic">
+          <p className="font-baloo font-medium text-[12px] text-[#A20505]">
             {stock}
           </p>
         )}
 
         {/* Buy Now Button */}
-        <button className="w-full h-[42px] bg-primary text-white font-baloo font-bold text-[18px] rounded-[8px] hover:bg-primary/90 transition-colors">
+        <button className="w-full h-10.5 bg-primary text-[#FFEBEB] font-baloo font-medium text-base  rounded-[8px] hover:bg-primary/90 transition-colors">
           Buy Now
         </button>
       </div>
