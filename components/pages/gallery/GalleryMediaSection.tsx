@@ -46,7 +46,7 @@ const categories: GalleryCategory[] = [
 ];
 
 export default function GalleryMediaSection() {
-  const [openIds, setOpenIds] = useState<string[]>(["01", "03"]);
+  const [openIds, setOpenIds] = useState<string[]>(["01"]);
 
   // Modal State
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
