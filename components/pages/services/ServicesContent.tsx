@@ -69,7 +69,7 @@ const services: ServiceItem[] = [
 ];
 
 export default function ServicesContent() {
-  const [openIds, setOpenIds] = useState<string[]>(["02", "03"]); // Based on screenshot showing 02, 03, 04 open or 01 closed. I'll just open 02 for demo.
+  const [openIds, setOpenIds] = useState<string[]>(["01"]);
 
   const toggleAccordion = (id: string) => {
     setOpenIds(prev =>
@@ -122,7 +122,7 @@ export default function ServicesContent() {
               <div className={`overflow-hidden transition-all duration-500 ease-in-out ${openIds.includes(service.id) ? 'max-h-[2000px] mb-12' : 'max-h-0'}`}>
                 <div className="flex flex-col gap-12 ">
                   {/* Large Image */}
-                  <div className="relative w-full aspect-video lg:aspect-[21/9] rounded-[24px] overflow-hidden">
+                  <div className="relative w-full aspect-video lg:aspect-21/9 rounded-[24px] overflow-hidden">
                     <Image
                       src={service.image}
                       alt={service.title}
