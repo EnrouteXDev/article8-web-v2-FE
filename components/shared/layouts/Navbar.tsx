@@ -53,10 +53,10 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${shouldHideNavbar
-          ? "opacity-0 pointer-events-none -translate-y-full"
-          : "opacity-100 translate-y-0"
+        ? "opacity-0 pointer-events-none -translate-y-full"
+        : "opacity-100 translate-y-0"
         } ${isScrolled
-          ? "bg-white/10 backdrop-blur-md border-b border-white/10"
+          ? "bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200"
           : "bg-transparent"
         }`}
     >
@@ -64,7 +64,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="relative w-[184px] h-[54px]">
           <Image
-            src="/Logo.svg"
+            src={"/Logo.svg"}
             alt="Article8 Media Logo"
             fill
             className="object-contain object-left"
@@ -78,7 +78,10 @@ export default function Navbar() {
             <Link
               key={link.name}
               href={link.href}
-              className="font-satoshi font-medium text-base text-white hover:opacity-80 transition-opacity uppercase"
+              className={`font-satoshi font-medium text-base transition-all duration-300 uppercase ${isScrolled
+                ? "text-gray-900 hover:text-gray-600"
+                : "text-white hover:opacity-80"
+                }`}
             >
               {link.name}
             </Link>
