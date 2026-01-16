@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import SectionHeader from "@/components/shared/headers/SectionHeader";
 import ArtifactCard, { Artifact } from "./ArtifactCard";
 import CarouselControls from "./CarouselControls";
@@ -58,43 +58,26 @@ const ARTIFACTS: Artifact[] = [
   },
 ];
 
-// Slide distance for enter/exit animations
-const SLIDE_DISTANCE = 150;
-
 export default function ArtifactsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [direction, setDirection] = useState(0); // -1 for prev, 1 for next
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const minSwipeDistance = 50;
 
   const nextSlide = useCallback(() => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % ARTIFACTS.length);
-    setTimeout(() => setIsTransitioning(false), 500);
-  }, [isTransitioning]);
+  }, []);
 
   const prevSlide = useCallback(() => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setDirection(-1);
     setCurrentIndex((prev) => (prev - 1 + ARTIFACTS.length) % ARTIFACTS.length);
-    setTimeout(() => setIsTransitioning(false), 500);
-  }, [isTransitioning]);
+  }, []);
 
   const goToSlide = (index: number) => {
-    if (isTransitioning || index === currentIndex) return;
-    setIsTransitioning(true);
-    setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
-    setTimeout(() => setIsTransitioning(false), 500);
   };
 
-  // Touch handlers for swipe
+  // Touch handlers
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
@@ -124,58 +107,84 @@ export default function ArtifactsSection() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [nextSlide, prevSlide]);
 
-  // Calculate which cards to show (prev, current, next)
-  const getVisibleIndices = () => {
-    const prev = (currentIndex - 1 + ARTIFACTS.length) % ARTIFACTS.length;
-    const next = (currentIndex + 1) % ARTIFACTS.length;
-    return [prev, currentIndex, next];
+  /**
+   * Calculates the relative position of an item to the current index.
+   * Returns:
+   * 0: Active center
+   * 1: Immediate right
+   * -1: Immediate left
+   * 2: Far right
+   * -2: Far left
+   */
+  const getRelativePosition = (index: number) => {
+    const total = ARTIFACTS.length;
+    // Calculate simple difference
+    let diff = (index - currentIndex) % total;
+
+    // Adjust for wrapping (e.g. if total is 7, moving from 0 to 6 should be -1, not 6)
+    if (diff > total / 2) diff -= total;
+    if (diff < -total / 2) diff += total;
+
+    return diff;
   };
 
-  const [prevIndex, activeIndex, nextIndex] = getVisibleIndices();
-
-  // Animation variants for the sliding cards
-  const slideVariants = {
-    // For the previous card (left side)
-    prevEnter: { x: -SLIDE_DISTANCE, opacity: 0, scale: 0.95 },
-    prevCenter: { x: 0, opacity: 0.5, scale: 0.95 },
-    prevExit: { x: -SLIDE_DISTANCE, opacity: 0, scale: 0.95 },
-
-    // For the active card (center)
-    activeEnter: (dir: number) => ({
-      x: dir > 0 ? SLIDE_DISTANCE : -SLIDE_DISTANCE,
-      opacity: 0.5,
-      scale: 0.95,
-    }),
-    activeCenter: { x: 0, opacity: 1, scale: 1.02 },
-    activeExit: (dir: number) => ({
-      x: dir > 0 ? -SLIDE_DISTANCE : SLIDE_DISTANCE,
-      opacity: 0.5,
-      scale: 0.95,
-    }),
-
-    // For the next card (right side)
-    nextEnter: { x: SLIDE_DISTANCE, opacity: 0, scale: 0.95 },
-    nextCenter: { x: 0, opacity: 0.5, scale: 0.95 },
-    nextExit: { x: SLIDE_DISTANCE, opacity: 0, scale: 0.95 },
-
-    // Mobile variants
-    mobileEnter: (dir: number) => ({
-      x: dir > 0 ? 300 : -300,
+  // Animation variants
+  const cardVariants: Variants = {
+    active: {
+      x: "-50%", // Strictly centered
+      scale: 1,
+      zIndex: 30,
+      opacity: 1,
+      filter: "blur(0px)",
+      transition: { duration: 0.6, type: "spring", stiffness: 150, damping: 20 }
+    },
+    left: {
+      x: "calc(-50% - 480px)",
+      scale: 0.7, // CHANGED: Reduced from 0.85 to 0.7
+      zIndex: 20,
+      opacity: 0.6,
+      filter: "blur(2px)",
+      transition: { duration: 0.6, type: "spring", stiffness: 150, damping: 20 }
+    },
+    right: {
+      x: "calc(-50% + 480px)",
+      scale: 0.7, // CHANGED: Reduced from 0.85 to 0.7
+      zIndex: 20,
+      opacity: 0.6,
+      filter: "blur(2px)",
+      transition: { duration: 0.6, type: "spring", stiffness: 150, damping: 20 }
+    },
+    hidden: {
+      x: "-50%", // Keep centered but hidden behind
+      scale: 0.5,
+      zIndex: 10,
       opacity: 0,
-      scale: 0.9,
-    }),
-    mobileCenter: { x: 0, opacity: 1, scale: 1 },
-    mobileExit: (dir: number) => ({
-      x: dir > 0 ? -300 : 300,
-      opacity: 0,
-      scale: 0.9,
-    }),
-  };
+      filter: "blur(10px)",
+      transition: { duration: 0.4 } // Faster exit
+    },
 
-  const transition = {
-    type: "spring" as const,
-    stiffness: 300,
-    damping: 30,
+    // Mobile Variants
+    mobileActive: {
+      x: "0%",
+      scale: 1,
+      zIndex: 30,
+      opacity: 1,
+      transition: { duration: 0.5, ease: "easeOut" }
+    },
+    mobileHiddenLeft: {
+      x: "-100%",
+      scale: 0.9,
+      zIndex: 10,
+      opacity: 0,
+      transition: { duration: 0.5, ease: "easeOut" }
+    },
+    mobileHiddenRight: {
+      x: "100%",
+      scale: 0.9,
+      zIndex: 10,
+      opacity: 0,
+      transition: { duration: 0.5, ease: "easeOut" }
+    }
   };
 
   return (
@@ -183,7 +192,7 @@ export default function ArtifactsSection() {
       <div className="section-container section-px flex flex-col gap-12 lg:gap-16">
 
         {/* Header Area */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 z-40 relative">
           <div className="flex flex-col gap-6 max-w-2xl">
             <SectionHeader
               smallHeader="Artifacts"
@@ -195,7 +204,6 @@ export default function ArtifactsSection() {
             </p>
           </div>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:block shrink-0">
             <CarouselControls
               onPrev={prevSlide}
@@ -208,90 +216,85 @@ export default function ArtifactsSection() {
         </div>
 
         {/* Carousel Area */}
+        {/* We fix the height here because absolute children collapse the parent */}
         <div
-          className="relative w-full"
+          className="relative w-full h-[550px] sm:h-[600px] lg:h-[650px] flex justify-center items-center perspective-1000"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-          {/* Desktop: 3 cards visible */}
-          <div className="hidden lg:flex items-center justify-center gap-8">
-            {/* Previous Card (Partial Left) */}
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.div
-                key={`prev-${prevIndex}`}
-                className="w-[400px] shrink-0 cursor-pointer"
-                variants={slideVariants}
-                initial="prevEnter"
-                animate="prevCenter"
-                exit="prevExit"
-                transition={transition}
-                onClick={prevSlide}
-              >
-                <ArtifactCard artifact={ARTIFACTS[prevIndex]} isActive={false} />
-              </motion.div>
-            </AnimatePresence>
+          {ARTIFACTS.map((artifact, index) => {
+            const position = getRelativePosition(index);
 
-            {/* Active Card (Center) */}
-            <AnimatePresence mode="popLayout" initial={false} custom={direction}>
-              <motion.div
-                key={`active-${activeIndex}`}
-                className="w-[550px] shrink-0 z-10"
-                custom={direction}
-                variants={slideVariants}
-                initial="activeEnter"
-                animate="activeCenter"
-                exit="activeExit"
-                transition={transition}
-              >
-                <ArtifactCard artifact={ARTIFACTS[activeIndex]} isActive={true} />
-              </motion.div>
-            </AnimatePresence>
+            // Determine animation state
+            let desktopState = "hidden";
+            if (position === 0) desktopState = "active";
+            else if (position === -1) desktopState = "left";
+            else if (position === 1) desktopState = "right";
 
-            {/* Next Card (Partial Right) */}
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.div
-                key={`next-${nextIndex}`}
-                className="w-[400px] shrink-0 cursor-pointer"
-                variants={slideVariants}
-                initial="nextEnter"
-                animate="nextCenter"
-                exit="nextExit"
-                transition={transition}
-                onClick={nextSlide}
-              >
-                <ArtifactCard artifact={ARTIFACTS[nextIndex]} isActive={false} />
-              </motion.div>
-            </AnimatePresence>
-          </div>
+            let mobileState = "mobileHiddenRight";
+            if (position === 0) mobileState = "mobileActive";
+            else if (position < 0) mobileState = "mobileHiddenLeft";
 
-          {/* Mobile/Tablet: Single card with peek */}
-          <div className="lg:hidden relative">
-            <div className="flex items-center justify-center overflow-hidden">
-              <AnimatePresence mode="popLayout" initial={false} custom={direction}>
+            const isActive = position === 0;
+
+            return (
+              <motion.div
+                key={artifact.id}
+                initial={false}
+                animate={desktopState}
+                variants={cardVariants}
+                className={`
+                  absolute top-0 
+                  /* Desktop Styling */
+                  hidden lg:block lg:w-[550px] lg:left-1/2 cursor-pointer
+                `}
+                onClick={() => {
+                  if (position === -1) prevSlide();
+                  if (position === 1) nextSlide();
+                }}
+              >
+                <ArtifactCard artifact={artifact} isActive={isActive} />
+              </motion.div>
+            );
+          })}
+
+          {/* Mobile specific loop (separated for cleaner variants/layout) */}
+          <div className="lg:hidden relative w-full h-full flex items-center justify-center">
+            {ARTIFACTS.map((artifact, index) => {
+              const position = getRelativePosition(index);
+              const isActive = position === 0;
+
+              // Logic for mobile only shows active, slides others out
+              let mobileVariant = "mobileHiddenRight";
+              if (position === 0) mobileVariant = "mobileActive";
+              else if (position < 0) mobileVariant = "mobileHiddenLeft";
+              else mobileVariant = "mobileHiddenRight"; // Right side hidden
+
+              // Optimization: Don't animate elements far away
+              if (Math.abs(position) > 1) return null;
+
+              return (
                 <motion.div
-                  key={`mobile-${activeIndex}`}
-                  className="w-[85vw] max-w-[500px]"
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="mobileEnter"
-                  animate="mobileCenter"
-                  exit="mobileExit"
-                  transition={transition}
+                  key={`mobile-${artifact.id}`}
+                  initial={false}
+                  animate={mobileVariant}
+                  variants={cardVariants}
+                  className="absolute w-[85vw] max-w-[450px]"
                 >
-                  <ArtifactCard artifact={ARTIFACTS[activeIndex]} isActive={true} />
+                  <ArtifactCard artifact={artifact} isActive={isActive} />
                 </motion.div>
-              </AnimatePresence>
-            </div>
+              )
+            })}
 
-            {/* Peek hints on mobile */}
-            <div className="absolute top-1/2 -translate-y-1/2 left-0 w-[40px] h-[200px] bg-linear-to-r from-background to-transparent pointer-events-none" />
-            <div className="absolute top-1/2 -translate-y-1/2 right-0 w-[40px] h-[200px] bg-linear-to-l from-background to-transparent pointer-events-none" />
+            {/* Peek Gradients for Mobile */}
+            <div className="absolute top-0 bottom-0 left-0 w-[40px] bg-linear-to-r from-background to-transparent z-40 pointer-events-none" />
+            <div className="absolute top-0 bottom-0 right-0 w-[40px] bg-linear-to-l from-background to-transparent z-40 pointer-events-none" />
           </div>
         </div>
 
         {/* Mobile Controls */}
-        <div className="flex justify-center items-center lg:hidden">
+        <div className="flex justify-center items-center lg:hidden z-40 relative">
           <CarouselControls
             onPrev={prevSlide}
             onNext={nextSlide}
