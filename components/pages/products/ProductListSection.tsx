@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -174,16 +175,18 @@ export default function ProductListSection() {
                 }}
                 className="flex flex-col group"
               >
-                {/* Image Container */}
-                <div className="relative aspect-16/10 w-full rounded-[24px] overflow-hidden mb-6 bg-[#000000] shadow-sm ring-1 ring-black/5">
-                  <Image
-                    src={product.image}
-                    alt={product.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
-                  />
-                </div>
+                {/* Image Container - Link to detail */}
+                <Link href={`/products/${product.id}`} className="block">
+                  <div className="relative aspect-16/10 w-full rounded-[24px] overflow-hidden mb-6 bg-[#000000] shadow-sm ring-1 ring-black/5">
+                    <Image
+                      src={product.image}
+                      alt={product.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
+                    />
+                  </div>
+                </Link>
 
                 {/* Content */}
                 <div className="flex flex-col items-start w-full">
@@ -200,9 +203,11 @@ export default function ProductListSection() {
                     {product.description}
                   </p>
 
-                  <button className="px-8 py-3.5 bg-[#FFEBEB] text-[#DA2439] font-satoshi font-bold text-[15px] rounded-xl transition-all duration-300 hover:bg-[#DA2439] hover:text-white hover:shadow-md active:scale-95">
-                    View project
-                  </button>
+                  <Link href={`/products/${product.id}`}>
+                    <button className="px-8 py-3.5 bg-[#FFEBEB] text-[#DA2439] font-satoshi font-bold text-[15px] rounded-xl transition-all duration-300 hover:bg-[#DA2439] hover:text-white hover:shadow-md active:scale-95 cursor-pointer">
+                      View project
+                    </button>
+                  </Link>
                 </div>
               </motion.div>
             ))}
