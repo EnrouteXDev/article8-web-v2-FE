@@ -8,6 +8,8 @@ import {
   Headphones,
   ShieldCheck,
   ChevronDown,
+  MessageSquareText,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -19,8 +21,10 @@ const productsSubItems = [
 
 const navItems = [
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
+  { href: "/admin/reviews", icon: MessageSquareText, label: "Reviews" },
   { href: "/admin/support", icon: Headphones, label: "Customer Support" },
   { href: "/admin/policy", icon: ShieldCheck, label: "Rules & Policy" },
+  { href: "/admin/settings", icon: Settings, label: "Settings" },
 ];
 
 export default function AdminSidebar() {

@@ -10,8 +10,10 @@ const pageTitles: Record<string, string> = {
   "/admin/products/category": "Products",
   "/admin/products/category/create": "Products",
   "/admin/orders": "Orders",
+  "/admin/reviews": "Reviews",
   "/admin/support": "Customer Support",
   "/admin/policy": "Rules & Policy",
+  "/admin/settings": "Settings",
 };
 
 export default function AdminHeader() {

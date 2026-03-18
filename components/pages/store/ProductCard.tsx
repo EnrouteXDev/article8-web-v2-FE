@@ -1,37 +1,54 @@
 "use client"
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ShoppingCart01Icon } from "hugeicons-react";
+import type { Product } from "@/lib/types";
+import { ProductStatus } from "@/lib/types";
 
 interface ProductCardProps {
-  name: string;
-  price: string;
-  image: string;
-  stock?: string;
+  product: Product;
 }
 
-export default function ProductCard({ name, price, image, stock }: ProductCardProps) {
+function getStockLabel(product: Product): string | undefined {
+  if (product.status === ProductStatus.OUT_OF_STOCK) return "Out of stock";
+  if (product.quantity <= 5) return `Only ${product.quantity} left`;
+  return undefined;
+}
+
+export default function ProductCard({ product }: ProductCardProps) {
+  const image = product.images?.[0];
+  const stock = getStockLabel(product);
+
   return (
     <div className="flex flex-col gap-4">
       {/* Image Container */}
-      <div className="relative w-full aspect-236/244  overflow-hidden group">
-        <Image
-          src={image}
-          alt={name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
-        />
+      <Link href={`/store/${product._id}`} className="block">
+      <div className="relative w-full aspect-236/244 overflow-hidden group bg-primary/5">
+        {image ? (
+          <Image
+            src={image}
+            alt={product.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-primary/20 text-xs font-satoshi">
+            No image
+          </div>
+        )}
       </div>
+      </Link>
 
       <div className="flex flex-col gap-3">
         {/* Name and Add to Cart */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex flex-col">
             <h4 className="font-baloo font-medium text-primary text-sm leading-tight opacity-70">
-              {name}
+              {product.name}
             </h4>
             <span className="font-baloo font-bold text-primary text-[17px]">
-              {price}
+              £{product.price.toFixed(2)}
             </span>
           </div>
 
@@ -51,7 +68,7 @@ export default function ProductCard({ name, price, image, stock }: ProductCardPr
         )}
 
         {/* Buy Now Button */}
-        <button className="w-full h-10.5 bg-primary text-[#FFEBEB] font-baloo font-medium text-base  rounded-[8px] hover:bg-primary/90 transition-colors">
+        <button className="w-full h-10.5 bg-primary text-[#FFEBEB] font-baloo font-medium text-base rounded-lg hover:bg-primary/90 transition-colors">
           Buy Now
         </button>
       </div>
