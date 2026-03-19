@@ -3,9 +3,12 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Heart, Share2, Star, MapPin, Minus, Plus } from "lucide-react";
 import { ShoppingCart01Icon } from "hugeicons-react";
 import { useProduct, useProducts } from "@/lib/queries/products";
+import { useAddToCart } from "@/lib/queries/cart";
+import { Spinner } from "@/components/ui/spinner";
 import ProductCard from "./ProductCard";
 import { ProductStatus } from "@/lib/types";
 
@@ -62,8 +65,10 @@ interface Props {
 }
 
 export default function ProductDetailContent({ id }: Props) {
+  const router = useRouter();
   const { data, isLoading, isError } = useProduct(id);
   const { data: similarData } = useProducts({ limit: 8 });
+  const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -258,17 +263,30 @@ export default function ProductDetailContent({ id }: Props) {
                     </div>
 
                     <button
-                      disabled={isOutOfStock}
+                      disabled={isOutOfStock || isAddingToCart}
+                      onClick={() =>
+                        addToCart({ productId: product._id, quantity })
+                      }
                       className="flex-1 h-11 flex items-center justify-center gap-2 border border-primary/20 rounded-lg text-primary font-satoshi text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      <ShoppingCart01Icon size={18} />
-                      Add to Cart
+                      {isAddingToCart ? (
+                        <Spinner className="size-4" />
+                      ) : (
+                        <ShoppingCart01Icon size={18} />
+                      )}
+                      {isAddingToCart ? "Adding..." : "Add to Cart"}
                     </button>
                   </div>
 
                   {/* Buy Now */}
                   <button
-                    disabled={isOutOfStock}
+                    disabled={isOutOfStock || isAddingToCart}
+                    onClick={() =>
+                      addToCart(
+                        { productId: product._id, quantity },
+                        { onSuccess: () => router.push("/cart") },
+                      )
+                    }
                     className="w-full h-12 bg-primary text-white font-baloo font-bold text-base rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Buy Now

@@ -135,6 +135,32 @@ export interface DeleteCategoryResponse {
   message: string
 }
 
+// ─── Cart ─────────────────────────────────────────────────────────────────────
+
+export interface CartItem {
+  product: Product
+  quantity: number
+}
+
+export interface Cart {
+  _id: string
+  sessionId: string
+  items: CartItem[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CartResponse {
+  message: string
+  cart: Cart
+  sessionId?: string
+}
+
+export interface AddToCartInput {
+  productId: string
+  quantity: number
+}
+
 export interface ForgotPasswordInput {
   email: string
 }

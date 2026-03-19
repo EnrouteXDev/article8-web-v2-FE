@@ -1,34 +1,16 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import CartItem from "@/components/pages/cart/CartItem";
 import CartSummary from "@/components/pages/cart/CartSummary";
-
-const MOCK_CART_ITEMS = [
-  {
-    id: "1",
-    name: "Article 8 shirt",
-    price: "£4.99",
-    image: "/demo.jpg",
-    quantity: 1,
-  },
-  {
-    id: "2",
-    name: "Article 8 shirt",
-    price: "£4.99",
-    image: "/demo.jpg",
-    quantity: 1,
-  },
-  {
-    id: "3",
-    name: "Article 8 shirt",
-    price: "£4.99",
-    image: "/demo.jpg",
-    quantity: 1,
-  },
-];
+import { useCart } from "@/lib/queries/cart";
+import { Spinner } from "@/components/ui/spinner";
+import type { Cart } from "@/lib/types";
 
 export default function CartPage() {
+  const { data: cart, isLoading } = useCart();
+
   return (
     <main className="min-h-screen bg-background pt-44 pb-32">
       <div className="section-container section-px">
@@ -36,21 +18,35 @@ export default function CartPage() {
           Shopping Cart
         </h1>
 
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
-          {/* Cart Items List */}
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col divide-y divide-gray-200">
-              {MOCK_CART_ITEMS.map((item) => (
-                <CartItem key={item.id} {...item} />
-              ))}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-24">
+            <Spinner className="size-8 text-primary" />
+          </div>
+        ) : !cart || (cart as Cart).items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <p className="font-satoshi text-lg text-primary/50">Your cart is empty.</p>
+            <Link
+              href="/store"
+              className="font-satoshi text-sm font-medium text-primary hover:underline"
+            >
+              Browse the store
+            </Link>
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col divide-y divide-gray-200">
+                {(cart as Cart).items.map((item) => (
+                  <CartItem key={item.product._id} item={item} />
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full lg:w-95 shrink-0">
+              <CartSummary cart={cart as Cart} />
             </div>
           </div>
-
-          {/* Checkout Summary */}
-          <div className="w-full lg:w-[380px] shrink-0">
-            <CartSummary />
-          </div>
-        </div>
+        )}
       </div>
     </main>
   );

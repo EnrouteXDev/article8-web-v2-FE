@@ -1,5 +1,10 @@
 import type { CategoryFilters, ProductFilters } from '@/lib/types'
 
+export const cartKeys = {
+  all: ['cart'] as const,
+  session: (sessionId: string) => [...cartKeys.all, sessionId] as const,
+}
+
 export const productKeys = {
   all: ['products'] as const,
   lists: () => [...productKeys.all, 'list'] as const,
