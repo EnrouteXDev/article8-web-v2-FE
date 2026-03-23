@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Baloo_2, Baloo_Da_2 } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
 import { QueryProvider } from "@/lib/providers/QueryProvider";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,6 +69,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${baloo.variable} ${balooDa2.variable} antialiased`}
       >
         <QueryProvider>{children}</QueryProvider>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

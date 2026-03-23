@@ -2,21 +2,28 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  Search,
-  ChevronsUpDown,
-  SlidersHorizontal,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Search, ChevronsUpDown, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import AdminPage from "@/components/admin/shared/AdminPage";
 import { useCategories, useDeleteCategory } from "@/lib/queries/categories";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 const VISIBLE_PRODUCTS = 3;
 
 export default function ProductCategoryPageContent() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const limit = 10;
 
   const { data, isLoading, isError } = useCategories({
@@ -25,6 +32,19 @@ export default function ProductCategoryPageContent() {
     limit,
   });
   const { mutate: remove, isPending: isDeleting } = useDeleteCategory();
+
+  const handleDelete = () => {
+    if (!deleteTarget) return;
+    remove(deleteTarget.id, {
+      onSuccess: () => {
+        toast.success(`"${deleteTarget.name}" deleted`);
+        setDeleteTarget(null);
+      },
+      onError: () => {
+        toast.error("Failed to delete category");
+      },
+    });
+  };
 
   const categories = data?.data ?? [];
   const totalPages = data?.totalPages ?? 1;
@@ -53,10 +73,6 @@ export default function ProductCategoryPageContent() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors">
-            <SlidersHorizontal className="size-4" />
-            Filters
-          </button>
           <Link
             href="/admin/products/category/create"
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors"
@@ -161,9 +177,8 @@ export default function ProductCategoryPageContent() {
                   </td>
                   <td className="py-4">
                     <button
-                      onClick={() => remove(category._id)}
-                      disabled={isDeleting}
-                      className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      onClick={() => setDeleteTarget({ id: category._id, name: category.name })}
+                      className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                     >
                       <Trash2 className="size-4" />
                     </button>
@@ -198,6 +213,32 @@ export default function ProductCategoryPageContent() {
           </div>
         </div>
       )}
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open && !isDeleting) setDeleteTarget(null); }}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete category</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete{" "}
+              <span className="font-medium text-foreground">&quot;{deleteTarget?.name}&quot;</span>?
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting && <Spinner className="size-3.5" />}
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminPage>
   );
 }

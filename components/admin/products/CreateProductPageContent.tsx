@@ -2,15 +2,20 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { UploadCloud, ShoppingCart } from "lucide-react";
 import AdminPage from "@/components/admin/shared/AdminPage";
 import { useCreateProduct } from "@/lib/queries/products";
 import { Spinner } from "@/components/ui/spinner";
 import { createProductSchema, type CreateProductFormValues } from "@/lib/schemas";
+import { uploadImages } from "@/lib/utils/cloudinary";
 
 export default function CreateProductPageContent() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -22,8 +27,10 @@ export default function CreateProductPageContent() {
     defaultValues: { name: "", url: "", price: "", quantity: "", description: "" },
   });
 
-  const [images, setImages] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const addMoreRef = useRef<HTMLInputElement>(null);
@@ -46,19 +53,50 @@ export default function CreateProductPageContent() {
 
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
-    const newUrls = Array.from(files).map((file) => URL.createObjectURL(file));
-    setImages((previous) => [...previous, ...newUrls]);
+    const newFiles = Array.from(files).slice(0, 4 - imageFiles.length);
+    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+    setImageFiles((prev) => [...prev, ...newFiles]);
+    setImagePreviews((prev) => [...prev, ...newPreviews]);
   };
 
-  const onSubmit = (values: CreateProductFormValues) => {
-    createProduct({
-      name: values.name,
-      url: values.url,
-      price: parseFloat(values.price),
-      quantity: parseInt(values.quantity, 10),
-      description: values.description,
-    });
+  const onSubmit = async (values: CreateProductFormValues) => {
+    let imageUrls: string[] = [];
+
+    if (imageFiles.length > 0) {
+      setIsUploading(true);
+      try {
+        imageUrls = await uploadImages(imageFiles);
+      } catch {
+        setIsUploading(false);
+        return;
+      }
+      setIsUploading(false);
+    }
+
+    createProduct(
+      {
+        name: values.name,
+        url: values.url,
+        price: parseFloat(values.price),
+        quantity: parseInt(values.quantity, 10),
+        description: values.description,
+        images: imageUrls,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Product published successfully");
+          router.push("/admin/dashboard");
+        },
+        onError: (err) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const message = (err as any)?.response?.data?.message ?? "Failed to publish product";
+          toast.error(message);
+        },
+      },
+    );
   };
+
+  const isBusy = isUploading || isPending;
 
   const displayName = name || "New Product";
   const displayPrice = price ? `£${price}` : "£0.00";
@@ -78,10 +116,15 @@ export default function CreateProductPageContent() {
         </div>
         <button
           onClick={handleSubmit(onSubmit)}
-          disabled={isPending}
+          disabled={isBusy}
           className="flex items-center gap-2 px-5 py-2 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isPending ? (
+          {isUploading ? (
+            <>
+              <Spinner className="size-4" />
+              Uploading images...
+            </>
+          ) : isPending ? (
             <>
               <Spinner className="size-4" />
               Publishing...
@@ -182,7 +225,7 @@ export default function CreateProductPageContent() {
               Upload images
             </label>
 
-            {images.length === 0 ? (
+            {imagePreviews.length === 0 ? (
               <div
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(event) => {
@@ -215,7 +258,7 @@ export default function CreateProductPageContent() {
             ) : (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 flex-wrap">
-                  {images.map((src, index) => (
+                  {imagePreviews.map((src, index) => (
                     <div
                       key={index}
                       className="relative size-24 rounded-lg overflow-hidden bg-gray-100 shrink-0"
@@ -270,10 +313,10 @@ export default function CreateProductPageContent() {
             </p>
 
             <div className="w-full aspect-4/3 rounded-lg bg-gray-100 overflow-hidden mb-2">
-              {images[0] && (
+              {imagePreviews[0] && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={images[0]}
+                  src={imagePreviews[0]}
                   alt="preview"
                   className="w-full h-full object-cover"
                 />
@@ -286,10 +329,10 @@ export default function CreateProductPageContent() {
                   key={index}
                   className="aspect-square rounded-md bg-gray-100 overflow-hidden"
                 >
-                  {images[index] && (
+                  {imagePreviews[index] && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={images[index]}
+                      src={imagePreviews[index]}
                       alt=""
                       className="w-full h-full object-cover"
                     />
