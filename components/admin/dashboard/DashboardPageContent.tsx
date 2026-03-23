@@ -10,17 +10,79 @@ import {
   SlidersHorizontal,
   Plus,
   MoreVertical,
+  ChevronDown,
+  Trash2,
+  EyeOff,
 } from "lucide-react";
+import { toast } from "sonner";
 import AdminPage from "@/components/admin/shared/AdminPage";
-import { useProducts } from "@/lib/queries/products";
+import { useProducts, useDeleteProduct, useHideProduct } from "@/lib/queries/products";
+import { Spinner } from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { ProductStatus } from "@/lib/types";
+
+const STATUS_OPTIONS = [
+  { label: "All", value: undefined },
+  { label: "Visible", value: ProductStatus.VISIBLE },
+  { label: "Hidden", value: ProductStatus.HIDDEN },
+  { label: "Out of stock", value: ProductStatus.OUT_OF_STOCK },
+] as const;
 
 export default function DashboardPageContent() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [status, setStatus] = useState<ProductStatus | undefined>(undefined);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [hideTarget, setHideTarget] = useState<{ id: string; name: string } | null>(null);
   const limit = 10;
 
-  const { data, isLoading, isError } = useProducts({ search: search || undefined, page, limit });
+  const { data, isLoading, isError } = useProducts({ search: search || undefined, status, page, limit });
+  const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct();
+  const { mutate: hideProduct, isPending: isHiding } = useHideProduct();
+
+  const handleDelete = () => {
+    if (!deleteTarget) return;
+    deleteProduct(deleteTarget.id, {
+      onSuccess: () => {
+        toast.success(`"${deleteTarget.name}" deleted`);
+        setDeleteTarget(null);
+      },
+      onError: () => {
+        toast.error("Failed to delete product");
+      },
+    });
+  };
+
+  const handleHide = () => {
+    if (!hideTarget) return;
+    hideProduct(hideTarget.id, {
+      onSuccess: () => {
+        toast.success(`"${hideTarget.name}" hidden`);
+        setHideTarget(null);
+      },
+      onError: () => {
+        toast.error("Failed to hide product");
+      },
+    });
+  };
 
   const products = data?.data ?? [];
   const totalPages = data?.totalPages ?? 1;
@@ -36,10 +98,34 @@ export default function DashboardPageContent() {
           )}
         </span>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors">
-            <SlidersHorizontal className="size-4" />
-            Filters
-          </button>
+          <DropdownMenu open={filterOpen} onOpenChange={setFilterOpen}>
+            <DropdownMenuTrigger asChild>
+              <button
+                className={`flex items-center gap-2 text-sm transition-colors ${status ? "text-primary font-medium" : "text-gray-600 hover:text-gray-900"}`}
+              >
+                <SlidersHorizontal className="size-4" />
+                {status ? STATUS_OPTIONS.find((o) => o.value === status)?.label : "Filters"}
+                <ChevronDown className={`size-3.5 transition-transform ${filterOpen ? "rotate-180" : ""}`} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              {STATUS_OPTIONS.map((option) => (
+                <DropdownMenuItem
+                  key={String(option.value)}
+                  onSelect={() => {
+                    setStatus(option.value as ProductStatus | undefined);
+                    setPage(1);
+                  }}
+                  className={`flex items-center justify-between ${status === option.value ? "text-primary font-medium" : ""}`}
+                >
+                  {option.label}
+                  {status === option.value && (
+                    <span className="size-1.5 rounded-full bg-primary" />
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Link
             href="/admin/products/create"
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors font-medium"
@@ -143,7 +229,7 @@ export default function DashboardPageContent() {
                 <td className="py-3.5 pr-6">
                   <div className="flex items-center gap-3">
                     <div className="relative size-10 rounded-md overflow-hidden shrink-0 bg-gray-100">
-                      {product.images?.[0] && (
+                      {product.images?.[0]?.startsWith("http") && (
                         <Image
                           src={product.images[0]}
                           alt={product.name}
@@ -197,9 +283,33 @@ export default function DashboardPageContent() {
                   £{product.price.toFixed(2)}
                 </td>
                 <td className="py-3.5">
-                  <button className="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
-                    <MoreVertical className="size-4" />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+                        <MoreVertical className="size-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-white! z-50!">
+                      <DropdownMenuGroup>
+                        {product.status === ProductStatus.VISIBLE && (
+                          <DropdownMenuItem
+                            onSelect={() => setHideTarget({ id: product._id, name: product.name })}
+                          >
+                            <EyeOff />
+                            Hide
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onSelect={() => setDeleteTarget({ id: product._id, name: product.name })}
+                        >
+                          <Trash2 />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </td>
               </tr>
             ))
@@ -230,6 +340,51 @@ export default function DashboardPageContent() {
           </div>
         </div>
       )}
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open && !isDeleting) setDeleteTarget(null); }}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete product</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete{" "}
+              <span className="font-medium text-foreground">&quot;{deleteTarget?.name}&quot;</span>?
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <Button  onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting && <Spinner className="size-3.5" />}
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={!!hideTarget}
+        onOpenChange={(open) => { if (!open && !isHiding) setHideTarget(null); }}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hide product</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to hide{" "}
+              <span className="font-medium text-foreground">&quot;{hideTarget?.name}&quot;</span>?
+              It will no longer be visible in the store.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isHiding}>Cancel</AlertDialogCancel>
+            <Button onClick={handleHide} disabled={isHiding}>
+              {isHiding && <Spinner className="size-3.5" />}
+              {isHiding ? "Hiding..." : "Hide"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminPage>
   );
 }

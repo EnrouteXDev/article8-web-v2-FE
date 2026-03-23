@@ -1,5 +1,4 @@
 "use client"
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart01Icon } from "hugeicons-react";
@@ -16,8 +15,21 @@ function getStockLabel(product: Product): string | undefined {
   return undefined;
 }
 
+function isValidImageSrc(src: string | undefined): src is string {
+  if (!src) return false;
+  try {
+    // Accept absolute URLs and root-relative paths
+    if (src.startsWith("/") || src.startsWith("http://") || src.startsWith("https://")) return true;
+    new URL(src);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function ProductCard({ product }: ProductCardProps) {
-  const image = product.images?.[0];
+  const rawImage = product.images?.[0];
+  const image = isValidImageSrc(rawImage) ? rawImage : undefined;
   const stock = getStockLabel(product);
 
   return (
