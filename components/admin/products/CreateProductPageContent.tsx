@@ -103,8 +103,8 @@ export default function CreateProductPageContent() {
   const displayQty = quantity ? parseInt(quantity, 10) : 0;
 
   return (
-    <AdminPage className="bg-white rounded-xl p-6">
-      <div className="flex items-start justify-between mb-8">
+    <AdminPage className="bg-white rounded-xl p-4 md:p-6">
+      <div className="flex items-start justify-between mb-6 md:mb-8">
         <div>
           <h1 className="text-xl font-bold text-gray-900">
             Product Information
@@ -139,7 +139,7 @@ export default function CreateProductPageContent() {
         <p className="text-sm text-red-500 mb-4">{errorMessage}</p>
       )}
 
-      <div className="flex gap-10">
+      <div className="flex flex-col-reverse md:flex-row gap-6 md:gap-10">
         <div className="flex-1 flex flex-col gap-5 min-w-0">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-gray-700">
@@ -305,8 +305,8 @@ export default function CreateProductPageContent() {
           </div>
         </div>
 
-        <div className="w-80 shrink-0">
-          <div className="border border-gray-200 rounded-xl p-4 sticky top-6">
+        <div className="w-full md:w-80 shrink-0">
+          <div className="border border-gray-200 rounded-xl p-4 md:sticky md:top-6">
             <p className="text-base font-semibold text-gray-900">Preview</p>
             <p className="text-xs text-gray-500 mt-0.5 mb-4">
               This is a preview of how the product will appear on the website

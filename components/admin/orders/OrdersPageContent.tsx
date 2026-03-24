@@ -64,7 +64,7 @@ export default function OrdersPageContent() {
   return (
     <AdminPage className="flex flex-col gap-5">
       {/* Stat cards */}
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
         {stats.map(({ label, value, red }) => (
           <div key={label} className="bg-white rounded-xl p-5 flex flex-col gap-2 border border-gray-100">
             <span className={`text-sm font-medium ${red ? "text-primary" : "text-gray-600"}`}>
@@ -77,7 +77,7 @@ export default function OrdersPageContent() {
         ))}
       </div>
 
-      <div className="bg-white rounded-xl p-6 flex flex-col gap-5">
+      <div className="bg-white rounded-xl p-4 md:p-6 flex flex-col gap-5">
         {/* Toolbar */}
         <div className="flex items-center gap-4">
           <div className="relative flex-1 max-w-sm">
@@ -105,8 +105,57 @@ export default function OrdersPageContent() {
           <p className="text-sm text-red-500">Failed to load orders.</p>
         )}
 
-        {/* Table */}
-        <table className="w-full text-sm">
+        {/* Mobile cards */}
+        <div className="flex flex-col gap-3 md:hidden">
+          {isLoading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="p-3 rounded-xl border border-gray-100 animate-pulse flex flex-col gap-2">
+                <div className="flex justify-between">
+                  <div className="h-4 w-24 rounded bg-gray-100" />
+                  <div className="h-5 w-20 rounded-md bg-gray-100" />
+                </div>
+                <div className="h-4 w-36 rounded bg-gray-100" />
+                <div className="flex justify-between">
+                  <div className="h-3 w-20 rounded bg-gray-100" />
+                  <div className="h-4 w-16 rounded bg-gray-100" />
+                </div>
+              </div>
+            ))
+          ) : orders.length === 0 ? (
+            <p className="text-center text-sm text-gray-400 py-10">No orders found.</p>
+          ) : (
+            orders.map((order) => {
+              const badge = statusBadge[order.status];
+              const totalGBP = `£${(order.totalNGN / order.exchangeRate).toFixed(2)}`;
+              const date = new Date(order.createdAt).toLocaleDateString("en-GB", {
+                day: "2-digit", month: "short", year: "numeric",
+              });
+              return (
+                <button
+                  key={order._id}
+                  onClick={() => setSelectedOrder(order)}
+                  className="w-full text-left p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors flex flex-col gap-1.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-gray-800">#{order.orderNumber}</span>
+                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${badge.bg} ${badge.text}`}>
+                      <span className={`size-1.5 rounded-full shrink-0 ${badge.dot}`} />
+                      {statusLabel[order.status]}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-700">{order.customer.firstName} {order.customer.lastName}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">{date}</span>
+                    <span className="text-sm font-semibold text-gray-800">{totalGBP}</span>
+                  </div>
+                </button>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop table */}
+        <table className="hidden md:table w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100">
               {["Order ID", "Date", "Customer", "Customer Email", "Total Amount"].map((h) => (

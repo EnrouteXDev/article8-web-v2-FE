@@ -144,7 +144,7 @@ export default function OrderDetailPanel({
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ ease: [0.22, 1, 0.36, 1], duration: 0.35 }}
-        className="fixed top-0 right-0 bottom-0 w-132.5 bg-white border-l border-gray-200 overflow-y-auto z-40 shadow-xl"
+        className="fixed top-0 right-0 bottom-0 w-full md:w-132.5 bg-white border-l border-gray-200 overflow-y-auto z-40 shadow-xl"
         style={{ fontFamily: "var(--font-satoshi)" }}
       >
         {/* Header */}
@@ -169,7 +169,7 @@ export default function OrderDetailPanel({
 
         <div className="p-6 flex flex-col gap-6">
           {/* Customer + pricing */}
-          <div className="flex gap-6">
+          <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1 flex flex-col gap-2.5">
               <p className="text-base font-bold text-gray-900">{fullName}</p>
               <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -186,7 +186,7 @@ export default function OrderDetailPanel({
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 min-w-48">
+            <div className="flex flex-col gap-2 md:min-w-48">
               {[
                 { label: "Order Amount",    value: formatGBP(subtotalNGN, exchangeRate) },
                 { label: "Coupon Discount", value: discountNGN > 0 ? `-${formatGBP(discountNGN, exchangeRate)}` : "—" },

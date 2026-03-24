@@ -88,7 +88,7 @@ export default function DashboardPageContent() {
   const totalPages = data?.totalPages ?? 1;
 
   return (
-    <AdminPage className="bg-white rounded-xl p-6 flex flex-col gap-5">
+    <AdminPage className="bg-white rounded-xl p-4 md:p-6 flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <span className="text-base font-semibold text-gray-800">
           {isLoading ? (
@@ -128,15 +128,16 @@ export default function DashboardPageContent() {
           </DropdownMenu>
           <Link
             href="/admin/products/create"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors font-medium"
+            className="flex items-center gap-2 px-3 py-2 md:px-4 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors font-medium"
           >
             <Plus className="size-4" />
-            Create new product
+            <span className="hidden sm:inline">Create new product</span>
+            <span className="sm:hidden">New</span>
           </Link>
         </div>
       </div>
 
-      <div className="relative w-72">
+      <div className="relative w-full md:w-72">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
         <input
           type="text"
@@ -154,7 +155,81 @@ export default function DashboardPageContent() {
         <p className="text-sm text-red-500">Failed to load products.</p>
       )}
 
-      <table className="w-full text-sm">
+      {/* Mobile cards */}
+      <div className="flex flex-col gap-3 md:hidden">
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 animate-pulse">
+              <div className="size-12 rounded-lg bg-gray-100 shrink-0" />
+              <div className="flex-1 flex flex-col gap-1.5">
+                <div className="h-4 w-32 rounded bg-gray-100" />
+                <div className="h-5 w-16 rounded-md bg-gray-100" />
+              </div>
+              <div className="flex flex-col items-end gap-1.5">
+                <div className="h-4 w-12 rounded bg-gray-100" />
+                <div className="h-3 w-16 rounded bg-gray-100" />
+              </div>
+            </div>
+          ))
+        ) : products.length === 0 ? (
+          <p className="text-center text-sm text-gray-400 py-10">No products found.</p>
+        ) : (
+          products.map((product) => (
+            <div key={product._id} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
+              <div className="relative size-12 rounded-lg overflow-hidden shrink-0 bg-gray-100">
+                {product.images?.[0]?.startsWith("http") && (
+                  <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-800 truncate">{product.name}</p>
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  {product.status === ProductStatus.VISIBLE ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-green-50 text-green-600 text-xs font-medium">
+                      <span className="size-1.5 rounded-full bg-green-500" />Visible
+                    </span>
+                  ) : product.status === ProductStatus.OUT_OF_STOCK ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-50 text-red-500 text-xs font-medium">
+                      <span className="size-1.5 rounded-full bg-red-400" />Out of stock
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-500 text-xs font-medium">
+                      <span className="size-1.5 rounded-full bg-gray-400" />Hidden
+                    </span>
+                  )}
+                  <span className="text-xs text-gray-400">Qty: {product.quantity}</span>
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                <span className="text-sm font-semibold text-gray-800">£{product.price.toFixed(2)}</span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+                      <MoreVertical className="size-4" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-white! z-50!">
+                    <DropdownMenuGroup>
+                      {product.status === ProductStatus.VISIBLE && (
+                        <DropdownMenuItem onSelect={() => setHideTarget({ id: product._id, name: product.name })}>
+                          <EyeOff />Hide
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem variant="destructive" onSelect={() => setDeleteTarget({ id: product._id, name: product.name })}>
+                        <Trash2 />Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <table className="hidden md:table w-full text-sm">
         <thead>
           <tr className="border-b border-gray-100">
             <th className="pb-3 text-left">
