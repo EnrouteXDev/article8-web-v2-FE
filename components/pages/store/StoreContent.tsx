@@ -1,11 +1,12 @@
 "use client"
-import React, { useState, useEffect } from "react";
+import React from "react";
+import Link from "next/link";
 import StoreSidebar from "./StoreSidebar";
 import ProductCard from "./ProductCard";
 import { ArrowDown01Icon, ShoppingCart01Icon } from "hugeicons-react";
 import { LayoutGrid } from "lucide-react";
-import { useProducts } from "@/lib/queries/products";
-import type { Product } from "@/lib/types";
+import { useInfiniteProducts } from "@/lib/queries/products";
+import { useCartCount } from "@/lib/queries/cart";
 
 const LIMIT = 12;
 
@@ -28,21 +29,13 @@ function ProductCardSkeleton() {
 }
 
 export default function StoreContent() {
-  const [page, setPage] = useState(1);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
+    useInfiniteProducts({ limit: LIMIT });
+  const cartCount = useCartCount();
 
-  const { data, isFetching, isLoading } = useProducts({ page, limit: LIMIT });
-
-  useEffect(() => {
-    if (data?.data) {
-      setAllProducts((prev) => (page === 1 ? data.data : [...prev, ...data.data]));
-    }
-  }, [data, page]);
-
-  const total = data?.total ?? 0;
-  const totalPages = data?.totalPages ?? 1;
-  const hasMore = page < totalPages;
-  const showing = allProducts.length;
+  const products = data?.pages.flatMap((p) => p.data) ?? [];
+  const total = data?.pages[0]?.total ?? 0;
+  const showing = products.length;
 
   return (
     <section className="w-full py-16 lg:py-24 bg-background section-px">
@@ -75,10 +68,10 @@ export default function StoreContent() {
                 <LayoutGrid size={20} />
               </button>
 
-              <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+              <Link href="/cart" className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
                 <ShoppingCart01Icon size={20} />
-                <span className="font-baloo font-bold text-sm">View Cart 0</span>
-              </button>
+                <span className="font-baloo font-bold text-sm">View Cart {cartCount > 0 ? `(${cartCount})` : ""}</span>
+              </Link>
             </div>
           </div>
 
@@ -88,7 +81,7 @@ export default function StoreContent() {
               ? Array.from({ length: LIMIT }).map((_, i) => (
                   <ProductCardSkeleton key={i} />
                 ))
-              : allProducts.map((product) => (
+              : products.map((product) => (
                   <ProductCard key={product._id} product={product} />
                 ))}
           </div>
@@ -99,13 +92,13 @@ export default function StoreContent() {
               <p className="font-satoshi text-primary/60 text-lg">
                 Showing {showing} of {total}
               </p>
-              {hasMore && (
+              {hasNextPage && (
                 <button
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={isFetching}
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
                   className="px-10 py-4 bg-primary text-white font-baloo font-bold text-lg rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-60"
                 >
-                  {isFetching ? "Loading..." : "Load More Products"}
+                  {isFetchingNextPage ? "Loading..." : "Load More Products"}
                 </button>
               )}
             </div>

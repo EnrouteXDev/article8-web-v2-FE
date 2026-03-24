@@ -174,3 +174,95 @@ export interface ResetPasswordInput {
 export interface MessageResponse {
   message: string
 }
+
+// ─── Orders ───────────────────────────────────────────────────────────────────
+
+export enum OrderStatus {
+  PENDING = 'pending',
+  CONFIRMED = 'confirmed',
+  PROCESSING = 'processing',
+  SHIPPED = 'shipped',
+  DELIVERED = 'delivered',
+  CANCELLED = 'cancelled',
+}
+
+export enum DeliveryStatus {
+  PENDING = 'pending',
+  PICKED_UP = 'picked_up',
+  IN_TRANSIT = 'in_transit',
+  OUT_FOR_DELIVERY = 'out_for_delivery',
+  DELIVERED = 'delivered',
+  FAILED = 'failed',
+}
+
+export interface OrderCustomer {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  addressLine1: string
+  addressLine2?: string
+  addressLine3?: string
+  city: string
+  state: string
+  postalCode: string
+  countryCode: string
+}
+
+export interface OrderItem {
+  product: string
+  name: string
+  quantity: number
+  priceGBP: number
+  priceNGN: number
+}
+
+export interface Order {
+  _id: string
+  orderNumber: string
+  customer: OrderCustomer
+  items: OrderItem[]
+  subtotalNGN: number
+  shippingCostNGN: number
+  shippingCostGBP?: number
+  discountNGN: number
+  totalNGN: number
+  exchangeRate: number
+  status: OrderStatus
+  paymentReference?: string
+  dhlTrackingNumber?: string
+  dhlShipmentId?: string
+  estimatedDeliveryDate?: string
+  deliveryStatus: DeliveryStatus
+  createdAt: string
+  updatedAt: string
+}
+
+export interface OrderFilters {
+  page?: number
+  limit?: number
+}
+
+export interface OrderResponse {
+  message: string
+  order: Order
+}
+
+export interface OrdersResponse {
+  message: string
+  data: Order[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface OrderTrackingResponse {
+  message: string
+  orderNumber: string
+  orderStatus: OrderStatus
+  deliveryStatus: DeliveryStatus
+  dhlTrackingNumber?: string
+  estimatedDeliveryDate?: string
+  tracking: Record<string, unknown> | null
+}

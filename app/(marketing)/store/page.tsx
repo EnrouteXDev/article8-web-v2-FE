@@ -10,7 +10,6 @@ export default function Store() {
         description="Our selection of curated items for your space."
       />
       <StoreContent />
-      {/* Additional Store Page Content will go here */}
     </main>
   );
 }
