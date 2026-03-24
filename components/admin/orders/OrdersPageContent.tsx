@@ -1,77 +1,72 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Search,
-  SlidersHorizontal,
-  Plus,
-  MoreVertical,
-  Upload,
-  ChevronDown,
-  Info,
-} from "lucide-react";
+import { Search, SlidersHorizontal, Upload, ChevronDown, Info, MoreVertical } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
-import OrderDetailPanel, {
-  type Order,
-  type OrderStatus,
-} from "@/components/admin/OrderDetailPanel";
 import AdminPage from "@/components/admin/shared/AdminPage";
+import OrderDetailPanel from "@/components/admin/OrderDetailPanel";
+import { useOrders } from "@/lib/queries/orders";
+import { type Order, OrderStatus } from "@/lib/types";
+import { Spinner } from "@/components/ui/spinner";
 
-const sharedProducts = [
-  { id: "1765", name: "Article8 Shirt", image: "/artifact1.jpeg", qty: 1, amount: "£4.99" },
-  { id: "8775", name: "Article8 Vans", image: "/artifact2.jpeg", qty: 4, amount: "£4.99" },
-  { id: "7665", name: "Article8 Shirt", image: "/artifact3.jpeg", qty: 2, amount: "£4.99" },
-  { id: "0987", name: "Article8 Vans", image: "/artifact4.jpeg", qty: 1, amount: "£4.99" },
-];
-
-const sharedDetail = {
-  customer: "Aliyu Mudashiru",
-  email: "aliyumudahiru@gmail.com",
-  address: "372 Kola Lateef Jakande, Lagos",
-  phone: "+2348176549880",
-  orderAmount: "£420.99",
-  couponDiscount: "-£20.99",
-  shippingFee: "£10.99",
-  total: "£410.99",
-  products: sharedProducts,
+const statusBadge: Record<OrderStatus, { dot: string; text: string; bg: string }> = {
+  [OrderStatus.PENDING]:    { dot: "bg-yellow-400", text: "text-yellow-700", bg: "bg-yellow-50"  },
+  [OrderStatus.CONFIRMED]:  { dot: "bg-blue-500",   text: "text-blue-600",   bg: "bg-blue-50"   },
+  [OrderStatus.PROCESSING]: { dot: "bg-gray-400",   text: "text-gray-600",   bg: "bg-gray-100"  },
+  [OrderStatus.SHIPPED]:    { dot: "bg-purple-500", text: "text-purple-600", bg: "bg-purple-50" },
+  [OrderStatus.DELIVERED]:  { dot: "bg-green-500",  text: "text-green-600",  bg: "bg-green-50"  },
+  [OrderStatus.CANCELLED]:  { dot: "bg-red-500",    text: "text-red-600",    bg: "bg-red-50"    },
 };
 
-const orders: Order[] = [
-  { id: "#000010", date: "15/03/21", amount: "£84.99", status: "Completed" as OrderStatus, ...sharedDetail },
-  { id: "#000010", date: "15/03/21", amount: "£89.99", status: "Shipped" as OrderStatus, ...sharedDetail },
-  { id: "#000010", date: "15/03/21", amount: "£22.99", status: "Cancelled" as OrderStatus, ...sharedDetail },
-  { id: "#000010", date: "15/03/21", amount: "£4.99", status: "Processing" as OrderStatus, ...sharedDetail },
-];
-
-const stats = [
-  { label: "Total sales", value: "£489.98", red: false },
-  { label: "Total orders", value: "4", red: false },
-  { label: "Shipped orders", value: "2", red: false },
-  { label: "Processing orders", value: "1", red: false },
-  { label: "Cancelled orders", value: "1", red: true },
-];
-
-const statusBadge: Record<
-  OrderStatus,
-  { dot: string; text: string; bg: string }
-> = {
-  Completed: { dot: "bg-green-500", text: "text-green-600", bg: "bg-green-50" },
-  Shipped: { dot: "bg-purple-500", text: "text-purple-600", bg: "bg-purple-50" },
-  Cancelled: { dot: "bg-red-500", text: "text-red-600", bg: "bg-red-50" },
-  Processing: { dot: "bg-gray-400", text: "text-gray-600", bg: "bg-gray-100" },
+const statusLabel: Record<OrderStatus, string> = {
+  [OrderStatus.PENDING]:    "Pending",
+  [OrderStatus.CONFIRMED]:  "Confirmed",
+  [OrderStatus.PROCESSING]: "Processing",
+  [OrderStatus.SHIPPED]:    "Shipped",
+  [OrderStatus.DELIVERED]:  "Delivered",
+  [OrderStatus.CANCELLED]:  "Cancelled",
 };
+
+function SkeletonRow() {
+  return (
+    <tr className="border-b border-gray-100">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <td key={i} className="py-4 pr-4">
+          <div className="h-4 rounded bg-gray-100 animate-pulse" style={{ width: i === 1 ? "60px" : i === 3 ? "140px" : "100px" }} />
+        </td>
+      ))}
+      <td className="py-4">
+        <div className="size-6 rounded-md bg-gray-100 animate-pulse" />
+      </td>
+    </tr>
+  );
+}
 
 export default function OrdersPageContent() {
+  const [page, setPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const limit = 10;
+
+  const { data, isLoading, isError } = useOrders({ page, limit });
+
+  const orders = data?.data ?? [];
+  const totalOrders = data?.total ?? 0;
+  const totalPages = data?.totalPages ?? 1;
+
+  const stats = [
+    { label: "Total sales",        value: "—",              red: false },
+    { label: "Total orders",       value: isLoading ? "…" : String(totalOrders), red: false },
+    { label: "Shipped orders",     value: "—",              red: false },
+    { label: "Processing orders",  value: "—",              red: false },
+    { label: "Cancelled orders",   value: "—",              red: true  },
+  ];
 
   return (
     <AdminPage className="flex flex-col gap-5">
+      {/* Stat cards */}
       <div className="grid grid-cols-5 gap-4">
         {stats.map(({ label, value, red }) => (
-          <div
-            key={label}
-            className="bg-white rounded-xl p-5 flex flex-col gap-2 border border-gray-100"
-          >
+          <div key={label} className="bg-white rounded-xl p-5 flex flex-col gap-2 border border-gray-100">
             <span className={`text-sm font-medium ${red ? "text-primary" : "text-gray-600"}`}>
               {label}
             </span>
@@ -83,6 +78,7 @@ export default function OrdersPageContent() {
       </div>
 
       <div className="bg-white rounded-xl p-6 flex flex-col gap-5">
+        {/* Toolbar */}
         <div className="flex items-center gap-4">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
@@ -102,22 +98,20 @@ export default function OrdersPageContent() {
               Export CSV
               <ChevronDown className="size-4 text-gray-400" />
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors">
-              <Plus className="size-4" />
-              Add order
-            </button>
           </div>
         </div>
 
+        {isError && (
+          <p className="text-sm text-red-500">Failed to load orders.</p>
+        )}
+
+        {/* Table */}
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100">
-              {["Order ID", "Date", "Customer", "Customer Email", "Total Amount"].map((heading) => (
-                <th
-                  key={heading}
-                  className="pb-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide"
-                >
-                  {heading}
+              {["Order ID", "Date", "Customer", "Customer Email", "Total Amount"].map((h) => (
+                <th key={h} className="pb-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                  {h}
                 </th>
               ))}
               <th className="pb-3 text-left">
@@ -129,46 +123,83 @@ export default function OrdersPageContent() {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order, index) => {
-              const badge = statusBadge[order.status];
-              const isSelected =
-                selectedOrder?.id === order.id &&
-                selectedOrder?.status === order.status;
+            {isLoading ? (
+              Array.from({ length: limit }).map((_, i) => <SkeletonRow key={i} />)
+            ) : orders.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="py-16 text-center text-sm text-gray-400">
+                  No orders found.
+                </td>
+              </tr>
+            ) : (
+              orders.map((order, index) => {
+                const badge = statusBadge[order.status];
+                const isSelected = selectedOrder?.orderNumber === order.orderNumber;
+                const totalGBP = `£${(order.totalNGN / order.exchangeRate).toFixed(2)}`;
+                const date = new Date(order.createdAt).toLocaleDateString("en-GB", {
+                  day: "2-digit", month: "short", year: "numeric",
+                });
 
-              return (
-                <tr
-                  key={index}
-                  onClick={() => setSelectedOrder(order)}
-                  className={`cursor-pointer transition-colors ${
-                    index !== orders.length - 1 ? "border-b border-gray-100" : ""
-                  } ${isSelected ? "bg-gray-50" : "hover:bg-gray-50"}`}
-                >
-                  <td className="py-4 pr-4 text-sm font-medium text-gray-800">{order.id}</td>
-                  <td className="py-4 pr-4 text-sm text-gray-500">{order.date}</td>
-                  <td className="py-4 pr-4 text-sm text-gray-800">{order.customer}</td>
-                  <td className="py-4 pr-4 text-sm text-gray-500">{order.email}</td>
-                  <td className="py-4 pr-4 text-sm font-medium text-gray-800">{order.amount}</td>
-                  <td className="py-4 pr-4">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${badge.bg} ${badge.text}`}
-                    >
-                      <span className={`size-1.5 rounded-full shrink-0 ${badge.dot}`} />
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="py-4">
-                    <button
-                      onClick={(event) => event.stopPropagation()}
-                      className="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      <MoreVertical className="size-4" />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+                return (
+                  <tr
+                    key={order._id}
+                    onClick={() => setSelectedOrder(order)}
+                    className={`cursor-pointer transition-colors ${
+                      index !== orders.length - 1 ? "border-b border-gray-100" : ""
+                    } ${isSelected ? "bg-gray-50" : "hover:bg-gray-50"}`}
+                  >
+                    <td className="py-4 pr-4 text-sm font-medium text-gray-800">
+                      #{order.orderNumber}
+                    </td>
+                    <td className="py-4 pr-4 text-sm text-gray-500">{date}</td>
+                    <td className="py-4 pr-4 text-sm text-gray-800">
+                      {order.customer.firstName} {order.customer.lastName}
+                    </td>
+                    <td className="py-4 pr-4 text-sm text-gray-500">{order.customer.email}</td>
+                    <td className="py-4 pr-4 text-sm font-medium text-gray-800">{totalGBP}</td>
+                    <td className="py-4 pr-4">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${badge.bg} ${badge.text}`}>
+                        <span className={`size-1.5 rounded-full shrink-0 ${badge.dot}`} />
+                        {statusLabel[order.status]}
+                      </span>
+                    </td>
+                    <td className="py-4">
+                      <button
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        <MoreVertical className="size-4" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <p className="text-sm text-gray-500">Page {page} of {totalPages}</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1 || isLoading}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages || isLoading}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                {isLoading ? <Spinner className="size-3.5" /> : "Next"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <AnimatePresence>

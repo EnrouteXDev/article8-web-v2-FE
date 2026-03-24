@@ -4,36 +4,26 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Heart, Share2, Star, MapPin, Minus, Plus } from "lucide-react";
-import { ShoppingCart01Icon } from "hugeicons-react";
-import { useProduct, useProducts } from "@/lib/queries/products";
-import { useAddToCart } from "@/lib/queries/cart";
-import { Spinner } from "@/components/ui/spinner";
-import ProductCard from "./ProductCard";
-import { ProductStatus } from "@/lib/types";
-
-// ─── Static review data (until review API is available) ──────────────────────
-const MOCK_REVIEWS = [
-  { name: "Davio White", date: "15th May, 2022", rating: 4, text: "The shirt quality is a fantastic and my Kids Love it" },
-  { name: "Davio White", date: "15th May, 2022", rating: 4, text: "The shirt quality is a fantastic and my Kids Love it" },
-  { name: "Davio White", date: "15th May, 2022", rating: 4, text: "The shirt quality is a fantastic and my Kids Love it" },
-  { name: "Davio White", date: "15th May, 2022", rating: 4, text: "The shirt quality is a fantastic and my Kids Love it" },
-  { name: "Davio White", date: "15th May, 2022", rating: 4, text: "The shirt quality is a fantastic and my Kids Love it" },
-];
+import { ChevronLeft, ChevronRight, Share2, Star, MapPin, Minus, Plus } from "lucide-react";
 
 function StarRating({ rating, max = 5 }: { rating: number; max?: number }) {
   return (
     <div className="flex items-center gap-0.5">
       {Array.from({ length: max }).map((_, i) => (
-        <Star
-          key={i}
-          size={14}
-          className={i < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300 fill-gray-300"}
-        />
+        <Star key={i} size={14} className={i < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300 fill-gray-300"} />
       ))}
     </div>
   );
 }
+import { ShoppingCart01Icon } from "hugeicons-react";
+import { toast } from "sonner";
+import { useProduct, useProducts } from "@/lib/queries/products";
+import { useAddToCart, useCart, useUpdateCartItem, useRemoveCartItem } from "@/lib/queries/cart";
+import { Spinner } from "@/components/ui/spinner";
+import { ProductStatus } from "@/lib/types";
+import ProductReviews from "./ProductReviews";
+import ProductPolicies from "./ProductPolicies";
+import SimilarProducts from "./SimilarProducts";
 
 function ProductDetailSkeleton() {
   return (
@@ -60,6 +50,17 @@ function ProductDetailSkeleton() {
   );
 }
 
+function isValidImageSrc(src: string): boolean {
+  if (!src) return false;
+  try {
+    if (src.startsWith("/") || src.startsWith("http://") || src.startsWith("https://")) return true;
+    new URL(src);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 interface Props {
   id: string;
 }
@@ -68,24 +69,31 @@ export default function ProductDetailContent({ id }: Props) {
   const router = useRouter();
   const { data, isLoading, isError } = useProduct(id);
   const { data: similarData } = useProducts({ limit: 8 });
-  const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
+  const { data: cart } = useCart();
+  const { mutate: addToCart, isPending: isAdding } = useAddToCart();
+  const { mutate: updateItem, isPending: isUpdating } = useUpdateCartItem();
+  const { mutate: removeItem, isPending: isRemoving } = useRemoveCartItem();
 
   const [selectedImage, setSelectedImage] = useState(0);
-  const [quantity, setQuantity] = useState(1);
+  const [localQty, setLocalQty] = useState(1);
 
   const product = data?.product;
+  const validImages = (product?.images ?? []).filter(isValidImageSrc);
   const similarProducts = (similarData?.data ?? []).filter((p) => p._id !== id);
 
   const isOutOfStock = product?.status === ProductStatus.OUT_OF_STOCK;
+  const cartItem = cart?.items?.find((i) => i.product._id === id);
+  const inCart = !!cartItem;
+  const isPending = isAdding || isUpdating || isRemoving;
 
   const prevImage = () => {
-    if (!product?.images.length) return;
-    setSelectedImage((i) => (i === 0 ? product.images.length - 1 : i - 1));
+    if (!validImages.length) return;
+    setSelectedImage((i) => (i === 0 ? validImages.length - 1 : i - 1));
   };
 
   const nextImage = () => {
-    if (!product?.images.length) return;
-    setSelectedImage((i) => (i === product.images.length - 1 ? 0 : i + 1));
+    if (!validImages.length) return;
+    setSelectedImage((i) => (i === validImages.length - 1 ? 0 : i + 1));
   };
 
   if (isError) {
@@ -124,9 +132,9 @@ export default function ProductDetailContent({ id }: Props) {
                 <div className="flex flex-col gap-4 lg:w-[45%] shrink-0">
                   {/* Main image */}
                   <div className="relative w-full aspect-square bg-primary/5 rounded-xl overflow-hidden group">
-                    {product.images.length > 0 ? (
+                    {validImages.length > 0 ? (
                       <Image
-                        src={product.images[selectedImage]}
+                        src={validImages[selectedImage]}
                         alt={product.name}
                         fill
                         className="object-cover"
@@ -138,13 +146,8 @@ export default function ProductDetailContent({ id }: Props) {
                       </div>
                     )}
 
-                    {/* Drag to rotate label */}
-                    <span className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-sm text-primary text-xs font-satoshi px-3 py-1 rounded-full shadow-sm">
-                      Drag to rotate
-                    </span>
-
                     {/* Arrows */}
-                    {product.images.length > 1 && (
+                    {validImages.length > 1 && (
                       <>
                         <button
                           onClick={prevImage}
@@ -163,9 +166,9 @@ export default function ProductDetailContent({ id }: Props) {
                   </div>
 
                   {/* Thumbnails */}
-                  {product.images.length > 1 && (
+                  {validImages.length > 1 && (
                     <div className="flex gap-3">
-                      {product.images.map((src, i) => (
+                      {validImages.map((src, i) => (
                         <button
                           key={i}
                           onClick={() => setSelectedImage(i)}
@@ -201,10 +204,18 @@ export default function ProductDetailContent({ id }: Props) {
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-primary/40 shrink-0">
-                      <button className="hover:text-primary transition-colors">
-                        <Heart size={20} />
-                      </button>
-                      <button className="hover:text-primary transition-colors">
+                      <button
+                        className="hover:text-primary transition-colors"
+                        onClick={() => {
+                          const url = window.location.href;
+                          if (navigator.share) {
+                            navigator.share({ title: product.name, url });
+                          } else {
+                            navigator.clipboard.writeText(url);
+                            toast.success("Link copied to clipboard");
+                          }
+                        }}
+                      >
                         <Share2 size={20} />
                       </button>
                     </div>
@@ -243,138 +254,116 @@ export default function ProductDetailContent({ id }: Props) {
 
                   {/* Quantity + Add to cart */}
                   <div className="flex items-center gap-3 mt-2">
-                    <div className="flex items-center border border-primary/20 rounded-lg overflow-hidden">
-                      <button
-                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                        className="w-10 h-11 flex items-center justify-center text-primary hover:bg-primary/5 transition-colors"
-                      >
-                        <Minus size={16} />
-                      </button>
-                      <span className="w-10 text-center font-satoshi text-sm text-primary font-medium">
-                        {quantity}
-                      </span>
-                      <button
-                        onClick={() => setQuantity((q) => Math.min(product.quantity, q + 1))}
-                        disabled={isOutOfStock}
-                        className="w-10 h-11 flex items-center justify-center text-primary hover:bg-primary/5 transition-colors disabled:opacity-40"
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </div>
+                    {inCart ? (
+                      /* Cart qty stepper — directly updates cart */
+                      <div className="flex items-center border border-primary/20 rounded-lg overflow-hidden">
+                        <button
+                          disabled={isPending}
+                          onClick={() => {
+                            if (cartItem!.quantity === 1) {
+                              removeItem(product._id, { onError: () => toast.error("Failed to update cart") });
+                            } else {
+                              updateItem(
+                                { productId: product._id, quantity: cartItem!.quantity - 1 },
+                                { onError: () => toast.error("Failed to update cart") }
+                              );
+                            }
+                          }}
+                          className="w-10 h-11 flex items-center justify-center text-primary hover:bg-primary/5 transition-colors disabled:opacity-40"
+                        >
+                          <Minus size={16} />
+                        </button>
+                        <span className="w-10 text-center font-satoshi text-sm text-primary font-medium">
+                          {isUpdating ? <Spinner className="size-3 mx-auto" /> : cartItem!.quantity}
+                        </span>
+                        <button
+                          disabled={isPending}
+                          onClick={() =>
+                            updateItem(
+                              { productId: product._id, quantity: cartItem!.quantity + 1 },
+                              { onError: () => toast.error("Failed to update cart") }
+                            )
+                          }
+                          className="w-10 h-11 flex items-center justify-center text-primary hover:bg-primary/5 transition-colors disabled:opacity-40"
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      /* Local qty stepper — used when adding fresh */
+                      <div className="flex items-center border border-primary/20 rounded-lg overflow-hidden">
+                        <button
+                          onClick={() => setLocalQty((q) => Math.max(1, q - 1))}
+                          className="w-10 h-11 flex items-center justify-center text-primary hover:bg-primary/5 transition-colors"
+                        >
+                          <Minus size={16} />
+                        </button>
+                        <span className="w-10 text-center font-satoshi text-sm text-primary font-medium">
+                          {localQty}
+                        </span>
+                        <button
+                          onClick={() => setLocalQty((q) => Math.min(product.quantity, q + 1))}
+                          disabled={isOutOfStock}
+                          className="w-10 h-11 flex items-center justify-center text-primary hover:bg-primary/5 transition-colors disabled:opacity-40"
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
+                    )}
 
-                    <button
-                      disabled={isOutOfStock || isAddingToCart}
-                      onClick={() =>
-                        addToCart({ productId: product._id, quantity })
-                      }
-                      className="flex-1 h-11 flex items-center justify-center gap-2 border border-primary/20 rounded-lg text-primary font-satoshi text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {isAddingToCart ? (
-                        <Spinner className="size-4" />
-                      ) : (
+                    {inCart ? (
+                      <button
+                        onClick={() => router.push("/cart")}
+                        className="flex-1 h-11 flex items-center justify-center gap-2 border border-primary rounded-lg text-primary font-satoshi text-sm font-medium hover:bg-primary/5 transition-colors"
+                      >
                         <ShoppingCart01Icon size={18} />
-                      )}
-                      {isAddingToCart ? "Adding..." : "Add to Cart"}
-                    </button>
+                        View Cart
+                      </button>
+                    ) : (
+                      <button
+                        disabled={isOutOfStock || isAdding}
+                        onClick={() =>
+                          addToCart(
+                            { productId: product._id, quantity: localQty },
+                            { onError: () => toast.error("Failed to add to cart") }
+                          )
+                        }
+                        className="flex-1 h-11 flex items-center justify-center gap-2 border border-primary/20 rounded-lg text-primary font-satoshi text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        {isAdding ? <Spinner className="size-4" /> : <ShoppingCart01Icon size={18} />}
+                        {isAdding ? "Adding..." : "Add to Cart"}
+                      </button>
+                    )}
                   </div>
 
                   {/* Buy Now */}
                   <button
-                    disabled={isOutOfStock || isAddingToCart}
-                    onClick={() =>
+                    disabled={isOutOfStock || isPending}
+                    onClick={() => {
+                      if (inCart) {
+                        router.push("/cart");
+                        return;
+                      }
                       addToCart(
-                        { productId: product._id, quantity },
-                        { onSuccess: () => router.push("/cart") },
-                      )
-                    }
+                        { productId: product._id, quantity: localQty },
+                        { onSuccess: () => router.push("/cart") }
+                      );
+                    }}
                     className="w-full h-12 bg-primary text-white font-baloo font-bold text-base rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    Buy Now
+                    {inCart ? "Go to Cart" : "Buy Now"}
                   </button>
                 </div>
               </div>
 
               {/* ── Bottom: reviews + shipping ── */}
               <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 mb-20">
-
-                {/* Reviews */}
-                <div className="flex-1">
-                  <h2 className="font-baloo font-bold text-primary text-2xl mb-6">Reviews</h2>
-                  <div className="flex flex-col gap-6">
-                    {MOCK_REVIEWS.map((review, i) => (
-                      <div key={i} className="flex flex-col gap-1">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-baloo font-bold text-sm shrink-0">
-                              {review.name[0]}
-                            </div>
-                            <span className="font-satoshi font-semibold text-sm text-primary">
-                              {review.name}
-                            </span>
-                          </div>
-                          <span className="font-satoshi text-xs text-primary/40">{review.date}</span>
-                        </div>
-                        <div className="pl-12">
-                          <StarRating rating={review.rating} />
-                          <p className="font-satoshi text-sm text-primary/70 mt-1">{review.text}</p>
-                        </div>
-                      </div>
-                    ))}
-                    <button className="font-satoshi text-sm text-primary font-medium hover:underline w-fit">
-                      View more...
-                    </button>
-                  </div>
-                </div>
-
-                {/* Shipping & Returns */}
-                <div className="lg:w-[40%] shrink-0 flex flex-col gap-5">
-                  {/* Shipping */}
-                  <div className="bg-[#FFEBEB] rounded-xl p-6">
-                    <h3 className="font-baloo font-bold text-primary text-xl mb-3">Shipping</h3>
-                    <p className="font-satoshi text-sm text-primary/70 leading-relaxed mb-3">
-                      We know how exciting it is to receive your order, so we work hard to get it to you as quickly and reliably as possible. Here&apos;s what you can expect:
-                    </p>
-                    <p className="font-satoshi text-sm font-semibold text-primary mb-2">Processing Time</p>
-                    <ul className="list-disc list-inside font-satoshi text-sm text-primary/70 leading-relaxed space-y-1">
-                      <li>Orders are typically processed within 1–2 business days, Within state</li>
-                      <li>During peak seasons or promotional events, processing may take up to 3 business days.</li>
-                    </ul>
-                  </div>
-
-                  {/* Return Policy */}
-                  <div className="bg-[#FFEBEB] rounded-xl p-6">
-                    <h3 className="font-baloo font-bold text-primary text-xl mb-3">Return Policy</h3>
-                    <p className="font-satoshi text-sm text-primary/70 leading-relaxed mb-3">
-                      We offer a 7-day return window for items that are unused, in their original packaging, and accompanied by proof of purchase. Returns are not accepted for clearance items, custom orders, or products damaged through misuse. If you receive a defective or incorrect item, you can request an exchange within 3 days of delivery, and we&apos;ll cover the cost of shipping.
-                    </p>
-                    <p className="font-satoshi text-sm text-primary/70 leading-relaxed">
-                      Once we receive and inspect your return, refunds are processed within 5–7 business days to your original payment method. Please note that shipping fees are non-refundable, unless the return is due to our error. For all return or exchange requests, simply reach out to our support team and we&apos;ll guide you through the process smoothly.
-                    </p>
-                  </div>
-                </div>
+                <ProductReviews />
+                <ProductPolicies />
               </div>
 
               {/* ── Similar Products ── */}
-              {similarProducts.length > 0 && (
-                <div className="flex flex-col gap-6">
-                  <h2 className="font-baloo font-bold text-primary text-2xl">Similar Products</h2>
-                  <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
-                    {similarProducts.map((p) => (
-                      <div key={p._id} className="w-[180px] shrink-0">
-                        <ProductCard product={p} />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex justify-center mt-4">
-                    <Link
-                      href="/store"
-                      className="px-10 py-3 bg-primary text-white font-baloo font-bold text-base rounded-lg hover:bg-primary/90 transition-colors"
-                    >
-                      View More Products
-                    </Link>
-                  </div>
-                </div>
-              )}
+              <SimilarProducts products={similarProducts} />
             </>
           ) : null}
 

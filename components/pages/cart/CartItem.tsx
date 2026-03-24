@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
 import { Delete02Icon } from "hugeicons-react";
 import { Spinner } from "@/components/ui/spinner";
@@ -11,16 +10,31 @@ interface CartItemProps {
   item: CartItemType;
 }
 
+function isValidImageSrc(src: string | undefined): src is string {
+  if (!src) return false;
+  try {
+    if (src.startsWith("/") || src.startsWith("http://") || src.startsWith("https://")) return true;
+    new URL(src);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function CartItem({ item }: CartItemProps) {
   const { product, quantity } = item;
+  const image = isValidImageSrc(product.images?.[0]) ? product.images[0] : undefined;
   const { mutate: updateItem, isPending: isUpdating } = useUpdateCartItem();
   const { mutate: removeItem, isPending: isRemoving } = useRemoveCartItem();
 
   const isPending = isUpdating || isRemoving;
 
   const decrement = () => {
-    if (quantity <= 1) return;
-    updateItem({ productId: product._id, quantity: quantity - 1 });
+    if (quantity === 1) {
+      removeItem(product._id);
+    } else {
+      updateItem({ productId: product._id, quantity: quantity - 1 });
+    }
   };
 
   const increment = () => {
@@ -34,9 +48,9 @@ export default function CartItem({ item }: CartItemProps) {
       <div className="flex items-start sm:items-stretch gap-4 sm:gap-6">
         {/* Product Image */}
         <div className="relative w-25 h-28 sm:w-37.75 sm:h-42.25 overflow-hidden rounded-lg shrink-0 bg-primary/5">
-          {product.images?.[0] ? (
+          {image ? (
             <Image
-              src={product.images[0]}
+              src={image}
               alt={product.name}
               fill
               className="object-cover"
@@ -60,7 +74,7 @@ export default function CartItem({ item }: CartItemProps) {
             <div className="flex items-center gap-3">
               <button
                 onClick={decrement}
-                disabled={isPending || quantity <= 1}
+                disabled={isPending}
                 className="w-7.5 h-7.5 flex items-center justify-center border border-[#E5E5E5] rounded-sm hover:bg-gray-50 transition-colors disabled:opacity-40"
               >
                 {isUpdating ? <Spinner className="size-3" /> : "-"}
@@ -99,7 +113,7 @@ export default function CartItem({ item }: CartItemProps) {
         <div className="flex items-center gap-4">
           <button
             onClick={decrement}
-            disabled={isPending || quantity <= 1}
+            disabled={isPending}
             className="w-[35px] h-[35px] flex items-center justify-center border border-[#E5E5E5] rounded-sm hover:bg-gray-50 transition-colors disabled:opacity-40"
           >
             {isUpdating ? <Spinner className="size-3" /> : "-"}
