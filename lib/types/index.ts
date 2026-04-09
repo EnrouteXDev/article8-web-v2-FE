@@ -16,10 +16,25 @@ export enum AdminPermission {
   POLICY = 'policy',
 }
 
+export enum ReturnRule {
+  CUSTOMER_PAYS = 'customerPaysReturnShipping',
+  FREE_RETURN = 'freeReturnShipping',
+}
+
 export enum ProductStatus {
   VISIBLE = 'visible',
   HIDDEN = 'hidden',
   OUT_OF_STOCK = 'out of stock',
+}
+
+export enum ProductAvailability {
+  AVAILABLE = 'available',
+  OUT_OF_STOCK = 'out_of_stock',
+}
+
+export enum ProductPriceSort {
+  LOW_TO_HIGH = 'low_to_high',
+  HIGH_TO_LOW = 'high_to_low',
 }
 
 // ─── Entities ─────────────────────────────────────────────────────────────────
@@ -70,12 +85,26 @@ export interface CreateProductInput {
   quantity: number
   description: string
   images?: string[]
+}
+
+export interface UpdateProductInput {
+  name?: string
+  url?: string
+  price?: number
+  quantity?: number
+  description?: string
+  images?: string[]
   status?: ProductStatus
 }
 
 export interface ProductFilters {
   search?: string
   status?: ProductStatus
+  category?: string
+  minPrice?: number
+  maxPrice?: number
+  availability?: ProductAvailability
+  priceSort?: ProductPriceSort
   page?: number
   limit?: number
 }
@@ -110,6 +139,29 @@ export interface ProductsResponse {
   page: number
   limit: number
   totalPages: number
+}
+
+export interface Policy {
+  _id: string
+  key: string
+  shippingPolicy: string
+  returnPolicy: string
+  returnWindow: number
+  returnRules: ReturnRule
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PolicyResponse {
+  message: string
+  policy: Policy
+}
+
+export interface UpsertPolicyInput {
+  shippingPolicy: string
+  returnPolicy: string
+  returnWindow: number
+  returnRules: ReturnRule
 }
 
 export interface DeleteProductResponse {
@@ -265,4 +317,83 @@ export interface OrderTrackingResponse {
   dhlTrackingNumber?: string
   estimatedDeliveryDate?: string
   tracking: Record<string, unknown> | null
+}
+
+export interface OrderDashboardMetrics {
+  totalSales: number
+  totalOrders: number
+  totalShippedOrders: number
+  totalProcessingOrders: number
+  totalCancelledOrders: number
+}
+
+export interface OrderDashboardResponse {
+  message: string
+  metrics: OrderDashboardMetrics
+  orders: Array<{
+    orderId: string
+    date: string
+    customerName: string
+    customerEmail: string
+    totalAmount: number
+    status: OrderStatus
+  }>
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface CancelOrderInput {
+  cancellationReason: string
+}
+
+// ─── Support Tickets ──────────────────────────────────────────────────────────
+
+export enum SupportTicketStatus {
+  PENDING = 'pending',
+  RESOLVED = 'resolved',
+}
+
+export interface SupportTicketProduct {
+  _id: string
+  name: string
+  price: number
+  quantity: number
+  images: string[]
+  status: string
+}
+
+export interface SupportTicket {
+  id: string
+  status: SupportTicketStatus
+  name: string
+  email: string
+  phoneNumber: string
+  orderId: string
+  complaint: string
+  images: string[]
+  reply?: string
+  respondedAt?: string
+  createdAt: string
+  product?: SupportTicketProduct
+  order?: {
+    orderNumber: string
+    customer: OrderCustomer
+    status: OrderStatus
+    createdAt: string
+  }
+}
+
+export interface SupportTicketsResponse {
+  message: string
+  data: SupportTicket[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface ReplySupportTicketInput {
+  reply: string
 }

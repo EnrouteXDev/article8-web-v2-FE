@@ -15,115 +15,54 @@ import TicketDetailPanel, {
   type TicketPriority,
 } from "@/components/admin/TicketDetailPanel";
 import AdminPage from "@/components/admin/shared/AdminPage";
+import { useSupportTickets } from "@/lib/queries/support";
+import { SupportTicketStatus, type SupportTicket } from "@/lib/types";
 
-const sharedProducts = [
-  { id: "1765", name: "Article8 Shirt", image: "/artifact1.jpeg", qty: 1, amount: "£4.99" },
-  { id: "8775", name: "Article8 Vans", image: "/artifact2.jpeg", qty: 4, amount: "£4.99" },
-  { id: "7665", name: "Article8 Shirt", image: "/artifact3.jpeg", qty: 2, amount: "£4.99" },
-  { id: "0987", name: "Article8 Vans", image: "/artifact4.jpeg", qty: 1, amount: "£4.99" },
-];
+const MOCK_PRIORITY: TicketPriority = "Medium";
 
-const sharedCustomer = {
-  customer: "Aliyu Mudashiru",
-  email: "aliyumudahiru@gmail.com",
-  address: "372 Kola Lateef Jakande, Lagos",
-  phone: "+2348176549880",
-  orderId: "#000010",
-  orderAmount: "£420.99",
-  couponDiscount: "-£20.99",
-  shippingFee: "£10.99",
-  total: "£410.99",
-  products: sharedProducts,
-  message:
-    "Hello, I received my order but unfortunately the shirt I ordered has a visible defect — there is a small tear on the left sleeve. I have attached photos for reference. I would like to request a return or exchange. Please advise on the next steps. Thank you.",
-  attachments: [
-    { name: "image.jpg", size: "2.4 MB" },
-    { name: "screenshot.jpg", size: "1.1 MB" },
-  ],
-};
+function mapTicket(t: SupportTicket): Ticket {
+  const customer = t.order?.customer;
+  const address = customer
+    ? [customer.addressLine1, customer.city, customer.state]
+        .filter(Boolean)
+        .join(", ")
+    : "—";
+  const date = new Date(t.createdAt).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  });
 
-const tickets: Ticket[] = [
-  {
-    id: "#TKT001",
-    title: "Defective item received",
-    date: "15/03/21",
-    status: "Opened" as TicketStatus,
-    priority: "High" as TicketPriority,
-    ...sharedCustomer,
-  },
-  {
-    id: "#TKT002",
-    title: "Wrong size delivered",
-    date: "14/03/21",
-    status: "Opened" as TicketStatus,
-    priority: "Medium" as TicketPriority,
-    ...sharedCustomer,
-  },
-  {
-    id: "#TKT003",
-    title: "Package not received",
-    date: "13/03/21",
-    status: "Opened" as TicketStatus,
-    priority: "High" as TicketPriority,
-    ...sharedCustomer,
-  },
-  {
-    id: "#TKT004",
-    title: "Refund not processed",
-    date: "12/03/21",
-    status: "Opened" as TicketStatus,
-    priority: "Low" as TicketPriority,
-    ...sharedCustomer,
-  },
-  {
-    id: "#TKT005",
-    title: "Missing item in order",
-    date: "11/03/21",
-    status: "Opened" as TicketStatus,
-    priority: "Medium" as TicketPriority,
-    ...sharedCustomer,
-  },
-  {
-    id: "#TKT006",
-    title: "Colour different from listing",
-    date: "10/03/21",
-    status: "Opened" as TicketStatus,
-    priority: "Low" as TicketPriority,
-    ...sharedCustomer,
-  },
-  {
-    id: "#TKT007",
-    title: "Exchange request",
-    date: "09/03/21",
-    status: "Closed" as TicketStatus,
-    priority: "Low" as TicketPriority,
-    ...sharedCustomer,
-  },
-  {
-    id: "#TKT008",
-    title: "Incorrect billing",
-    date: "08/03/21",
-    status: "Closed" as TicketStatus,
-    priority: "Medium" as TicketPriority,
-    ...sharedCustomer,
-  },
-  {
-    id: "#TKT009",
-    title: "Delayed delivery",
-    date: "07/03/21",
-    status: "Closed" as TicketStatus,
-    priority: "Low" as TicketPriority,
-    ...sharedCustomer,
-  },
-  {
-    id: "#TKT010",
-    title: "Coupon not applied",
-    date: "06/03/21",
-    status: "Closed" as TicketStatus,
-    priority: "Medium" as TicketPriority,
-    ...sharedCustomer,
-  },
-];
+  return {
+    id: String(t.id),
+    title: t.complaint.slice(0, 60) + (t.complaint.length > 60 ? "…" : ""),
+    customer: t.name,
+    email: t.email,
+    address,
+    phone: t.phoneNumber,
+    orderId: `#${t.orderId}`,
+    date,
+    status: t.status === SupportTicketStatus.RESOLVED ? "Closed" : "Opened",
+    priority: MOCK_PRIORITY,
+    message: t.complaint,
+    attachments: t.images.map((url, i) => ({ name: `image-${i + 1}.jpg`, size: "—" })),
+    products: t.product
+      ? [
+          {
+            id: t.product._id,
+            name: t.product.name,
+            image: t.product.images?.[0] ?? "/artifact1.jpeg",
+            qty: 1,
+            amount: `£${t.product.price.toFixed(2)}`,
+          },
+        ]
+      : [],
+    orderAmount: "—",
+    couponDiscount: "—",
+    shippingFee: "—",
+    total: "—",
+  };
+}
 
 const priorityStyles: Record<TicketPriority, string> = {
   Low: "text-green-600",
@@ -131,10 +70,28 @@ const priorityStyles: Record<TicketPriority, string> = {
   High: "text-red-600",
 };
 
+function SkeletonRow() {
+  return (
+    <tr className="border-b border-gray-100">
+      {Array.from({ length: 7 }).map((_, i) => (
+        <td key={i} className="py-4 pr-4">
+          <div className="h-4 rounded bg-gray-100 animate-pulse" style={{ width: i === 1 ? "140px" : "90px" }} />
+        </td>
+      ))}
+      <td className="py-4">
+        <div className="size-6 rounded-md bg-gray-100 animate-pulse" />
+      </td>
+    </tr>
+  );
+}
+
 export default function SupportPageContent() {
   const [activeTab, setActiveTab] = useState<TicketStatus>("Opened");
   const [search, setSearch] = useState("");
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+
+  const { data, isLoading } = useSupportTickets();
+  const tickets = (data?.data ?? []).map(mapTicket);
 
   const opened = tickets.filter((ticket) => ticket.status === "Opened");
   const closed = tickets.filter((ticket) => ticket.status === "Closed");
@@ -203,7 +160,7 @@ export default function SupportPageContent() {
           </div>
         </div>
 
-        {filtered.length === 0 ? (
+        {filtered.length === 0 && !isLoading ? (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="size-16 rounded-full bg-gray-100 flex items-center justify-center">
               <SearchX className="size-7 text-gray-400" />
@@ -242,7 +199,9 @@ export default function SupportPageContent() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((ticket, index) => {
+              {isLoading
+                ? Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
+                : filtered.map((ticket, index) => {
                 const isSelected =
                   selectedTicket?.id === ticket.id &&
                   selectedTicket?.date === ticket.date;

@@ -50,15 +50,15 @@ export default function ProductCategoryPageContent() {
   const totalPages = data?.totalPages ?? 1;
 
   return (
-    <AdminPage className="bg-white rounded-xl p-6 flex flex-col gap-5">
+    <AdminPage className="bg-white rounded-xl p-4 md:p-6 flex flex-col gap-5">
       <p className="text-sm text-gray-500">
         <span className="text-gray-800 font-medium">Products</span>
         <span className="mx-1">/</span>
         Category
       </p>
 
-      <div className="flex items-center justify-between">
-        <div className="relative w-72">
+      <div className="flex items-center justify-between gap-3">
+        <div className="relative flex-1 md:w-72 md:flex-none">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
           <input
             type="text"
@@ -87,7 +87,52 @@ export default function ProductCategoryPageContent() {
         <p className="text-sm text-red-500">Failed to load categories.</p>
       )}
 
-      <table className="w-full text-sm">
+      {/* Mobile cards */}
+      <div className="flex flex-col gap-3 md:hidden">
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="p-3 rounded-xl border border-gray-100 animate-pulse flex flex-col gap-2">
+              <div className="h-4 w-28 rounded bg-gray-100" />
+              <div className="h-3 w-40 rounded bg-gray-100" />
+              <div className="h-3 w-24 rounded bg-gray-100" />
+            </div>
+          ))
+        ) : categories.length === 0 ? (
+          <p className="text-center text-sm text-gray-400 py-10">No categories found.</p>
+        ) : (
+          categories.map((category) => {
+            const visible = category.products.slice(0, VISIBLE_PRODUCTS);
+            const extra = category.products.length - VISIBLE_PRODUCTS;
+            return (
+              <div key={category._id} className="p-3 rounded-xl border border-gray-100 flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-1 flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-800">{category.name}</p>
+                  <p className="text-xs text-gray-500">
+                    {category.products.length === 0 ? "No products" : (
+                      <>
+                        {visible.map(p => p.name).join(", ")}
+                        {extra > 0 && ` +${extra} more`}
+                      </>
+                    )}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {new Date(category.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setDeleteTarget({ id: category._id, name: category.name })}
+                  className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <table className="hidden md:table w-full text-sm">
         <thead>
           <tr className="border-b border-gray-100">
             <th className="pb-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide">

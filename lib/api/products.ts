@@ -1,6 +1,7 @@
 import { client } from './client'
 import type {
   CreateProductInput,
+  UpdateProductInput,
   DeleteProductResponse,
   ProductFilters,
   ProductResponse,
@@ -19,6 +20,11 @@ export async function getProductById(id: string): Promise<ProductResponse> {
 
 export async function createProduct(data: CreateProductInput): Promise<ProductResponse> {
   const response = await client.post<ProductResponse>('/product', data)
+  return response.data
+}
+
+export async function updateProduct(id: string, data: UpdateProductInput): Promise<ProductResponse> {
+  const response = await client.put<ProductResponse>(`/product/${id}`, data)
   return response.data
 }
 

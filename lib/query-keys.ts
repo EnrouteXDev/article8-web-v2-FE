@@ -21,6 +21,17 @@ export const categoryKeys = {
   detail: (id: string) => [...categoryKeys.details(), id] as const,
 }
 
+export const policyKeys = {
+  all: ['policy'] as const,
+}
+
+export const supportKeys = {
+  all: ['support-tickets'] as const,
+  lists: () => [...supportKeys.all, 'list'] as const,
+  list: (status?: string, page?: number, limit?: number) =>
+    [...supportKeys.lists(), status, page, limit] as const,
+}
+
 export const orderKeys = {
   all: ['orders'] as const,
   lists: () => [...orderKeys.all, 'list'] as const,
@@ -28,4 +39,5 @@ export const orderKeys = {
   details: () => [...orderKeys.all, 'detail'] as const,
   detail: (orderNumber: string) => [...orderKeys.details(), orderNumber] as const,
   tracking: (orderNumber: string) => [...orderKeys.all, 'tracking', orderNumber] as const,
+  dashboard: (page?: number, limit?: number) => [...orderKeys.all, 'dashboard', page, limit] as const,
 }

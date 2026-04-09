@@ -15,30 +15,37 @@ const teams: Team[] = [
   {
     id: 1,
     number: "01",
-    name: "Growth",
+    name: "3D Animators",
     description:
-      "Our Growth team is the driving force behind expansion. They are dedicated to increasing our user base, and penetrating new markets. With a focus on data-driven strategies, ground-breaking partnerships and innovative marketing, the Growth org ensures we're continually reaching new heights and discovering fresh opportunities to expand our business.",
+      "The heartbeat of our productions. Our animators breathe life into every character and scene, crafting fluid, expressive movement that pulls audiences into the Skyfall universe. From action sequences to subtle emotional beats, they bring the story to life frame by frame.",
   },
   {
     id: 2,
     number: "02",
-    name: "Business",
+    name: "Modeling Artists",
     description:
-      "Our Business team drives strategic initiatives, partnerships, and revenue growth. They work closely with clients to understand their needs and deliver tailored solutions that exceed expectations while ensuring sustainable business development.",
+      "The architects of our world. Our modeling artists build every character, prop, and environment from the ground up — sculpting detailed 3D assets that form the visual foundation of everything you see on screen.",
   },
   {
     id: 3,
     number: "03",
-    name: "Product & Engineering",
+    name: "Lighting Artists",
     description:
-      "Our Product & Engineering team builds innovative solutions that power our services. They combine cutting-edge technology with user-centered design to create exceptional digital experiences that push the boundaries of what's possible.",
+      "The mood makers. Our lighting team shapes the emotional tone of every scene, using light and shadow to create atmosphere, depth, and cinematic polish that makes our work feel real and immersive.",
   },
   {
     id: 4,
     number: "04",
-    name: "Operations",
+    name: "Technical",
     description:
-      "Our Operations team ensures seamless execution across all projects. They optimize processes, manage resources, and maintain the highest standards of quality to keep our organization running efficiently and effectively.",
+      "The problem solvers behind the scenes. Our technical artists bridge the gap between creativity and technology — building rigs, optimizing pipelines, and ensuring every asset moves and renders exactly as it should.",
+  },
+  {
+    id: 5,
+    number: "05",
+    name: "Business",
+    description:
+      "The driving force behind the vision. Our business team manages the direction, strategy, and growth of Article 8 Media Studios — turning creative ambition into sustainable projects that reach audiences worldwide.",
   },
 ];
 
