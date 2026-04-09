@@ -13,7 +13,9 @@ import {
   Phone,
 } from "lucide-react";
 import { type Order, OrderStatus, DeliveryStatus } from "@/lib/types";
-import { useOrderTracking } from "@/lib/queries/orders";
+import { useOrderTracking, useCancelOrder } from "@/lib/queries/orders";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -119,6 +121,7 @@ export default function OrderDetailPanel({
   const [cancelReason, setCancelReason] = useState("");
 
   const { data: tracking } = useOrderTracking(order.orderNumber);
+  const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
 
   const badge = statusBadge[order.status];
   const steps = getSteps(order);
@@ -320,7 +323,6 @@ export default function OrderDetailPanel({
         </div>
       )}
 
-      {/* Cancel modal — UI shell, pending backend endpoint */}
       {showCancelModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25">
           <div className="bg-white rounded-2xl p-6 w-96 shadow-xl flex flex-col gap-5" style={{ fontFamily: "var(--font-satoshi)" }}>
@@ -331,7 +333,7 @@ export default function OrderDetailPanel({
               <div>
                 <p className="text-base font-bold text-gray-900">Cancel order #{order.orderNumber}?</p>
                 <p className="text-sm text-gray-500 mt-1">
-                  Cancel order endpoint is not yet available. Contact the backend team.
+                  This action cannot be undone. Please provide a reason.
                 </p>
               </div>
             </div>
@@ -342,16 +344,39 @@ export default function OrderDetailPanel({
                   placeholder="Enter a reason..."
                   value={cancelReason}
                   onChange={(e) => setCancelReason(e.target.value)}
+                  disabled={isCancelling}
                   rows={4}
-                  className="px-4 py-3 rounded-lg border border-gray-200 text-sm placeholder:text-gray-400 outline-none focus:border-gray-400 transition-colors resize-none"
+                  className="px-4 py-3 rounded-lg border border-gray-200 text-sm placeholder:text-gray-400 outline-none focus:border-gray-400 transition-colors resize-none disabled:opacity-50"
                 />
               </div>
-              <button
-                onClick={() => setShowCancelModal(false)}
-                className="w-full h-12 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors"
-              >
-                Close
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCancelModal(false)}
+                  disabled={isCancelling}
+                  className="flex-1 h-12 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                >
+                  Go back
+                </button>
+                <button
+                  disabled={isCancelling || !cancelReason.trim()}
+                  onClick={() =>
+                    cancelOrder(
+                      { orderNumber: order.orderNumber, data: { cancellationReason: cancelReason } },
+                      {
+                        onSuccess: () => {
+                          toast.success("Order cancelled successfully");
+                          setShowCancelModal(false);
+                          onClose();
+                        },
+                        onError: () => toast.error("Failed to cancel order"),
+                      }
+                    )
+                  }
+                  className="flex-1 h-12 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isCancelling ? <><Spinner className="size-4" /> Cancelling...</> : "Confirm cancel"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

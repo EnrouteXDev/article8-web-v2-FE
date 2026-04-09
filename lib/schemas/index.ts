@@ -27,6 +27,26 @@ export const createProductSchema = z.object({
 
 export type CreateProductFormValues = z.infer<typeof createProductSchema>
 
+export const editProductSchema = z.object({
+  name: z.string().min(1, 'Product name is required'),
+  url: z.string().min(1, 'Product URL is required'),
+  price: z
+    .string()
+    .min(1, 'Price is required')
+    .refine((v) => !isNaN(parseFloat(v)) && parseFloat(v) >= 0, {
+      message: 'Enter a valid price',
+    }),
+  quantity: z
+    .string()
+    .min(1, 'Quantity is required')
+    .refine((v) => !isNaN(parseInt(v, 10)) && parseInt(v, 10) >= 0, {
+      message: 'Enter a valid quantity',
+    }),
+  description: z.string().min(1, 'Description is required'),
+})
+
+export type EditProductFormValues = z.infer<typeof editProductSchema>
+
 export const createCategorySchema = z.object({
   name: z.string().min(1, 'Category name is required'),
 })

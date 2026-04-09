@@ -5,7 +5,7 @@ import { Search, SlidersHorizontal, Upload, ChevronDown, Info, MoreVertical } fr
 import { AnimatePresence } from "framer-motion";
 import AdminPage from "@/components/admin/shared/AdminPage";
 import OrderDetailPanel from "@/components/admin/OrderDetailPanel";
-import { useOrders } from "@/lib/queries/orders";
+import { useOrders, useOrderDashboard } from "@/lib/queries/orders";
 import { type Order, OrderStatus } from "@/lib/types";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -48,17 +48,20 @@ export default function OrdersPageContent() {
   const limit = 10;
 
   const { data, isLoading, isError } = useOrders({ page, limit });
+  const { data: dashboard, isLoading: isDashboardLoading } = useOrderDashboard();
 
   const orders = data?.data ?? [];
-  const totalOrders = data?.total ?? 0;
   const totalPages = data?.totalPages ?? 1;
 
+  const m = dashboard?.metrics;
+  const fmt = (v?: number) => isDashboardLoading ? "…" : v !== undefined ? String(v) : "—";
+
   const stats = [
-    { label: "Total sales",        value: "—",              red: false },
-    { label: "Total orders",       value: isLoading ? "…" : String(totalOrders), red: false },
-    { label: "Shipped orders",     value: "—",              red: false },
-    { label: "Processing orders",  value: "—",              red: false },
-    { label: "Cancelled orders",   value: "—",              red: true  },
+    { label: "Total sales",       value: isDashboardLoading ? "…" : m ? `£${m.totalSales.toFixed(2)}` : "—", red: false },
+    { label: "Total orders",      value: fmt(m?.totalOrders),           red: false },
+    { label: "Shipped orders",    value: fmt(m?.totalShippedOrders),    red: false },
+    { label: "Processing orders", value: fmt(m?.totalProcessingOrders), red: false },
+    { label: "Cancelled orders",  value: fmt(m?.totalCancelledOrders),  red: true  },
   ];
 
   return (
@@ -125,7 +128,7 @@ export default function OrdersPageContent() {
             <p className="text-center text-sm text-gray-400 py-10">No orders found.</p>
           ) : (
             orders.map((order) => {
-              const badge = statusBadge[order.status];
+              const badge = statusBadge[order.status] ?? { dot: "bg-gray-400", text: "text-gray-500", bg: "bg-gray-100" };
               const totalGBP = `£${(order.totalNGN / order.exchangeRate).toFixed(2)}`;
               const date = new Date(order.createdAt).toLocaleDateString("en-GB", {
                 day: "2-digit", month: "short", year: "numeric",
@@ -182,7 +185,7 @@ export default function OrdersPageContent() {
               </tr>
             ) : (
               orders.map((order, index) => {
-                const badge = statusBadge[order.status];
+                const badge = statusBadge[order.status] ?? { dot: "bg-gray-400", text: "text-gray-500", bg: "bg-gray-100" };
                 const isSelected = selectedOrder?.orderNumber === order.orderNumber;
                 const totalGBP = `£${(order.totalNGN / order.exchangeRate).toFixed(2)}`;
                 const date = new Date(order.createdAt).toLocaleDateString("en-GB", {

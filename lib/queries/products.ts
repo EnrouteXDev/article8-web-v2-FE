@@ -4,10 +4,11 @@ import {
   getProducts,
   getProductById,
   createProduct,
+  updateProduct,
   hideProduct,
   deleteProduct,
 } from '@/lib/api/products'
-import type { CreateProductInput, ProductFilters } from '@/lib/types'
+import type { CreateProductInput, UpdateProductInput, ProductFilters } from '@/lib/types'
 
 export function useProducts(filters?: ProductFilters) {
   return useQuery({
@@ -54,6 +55,19 @@ export function useHideProduct() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: productKeys.lists() })
       queryClient.invalidateQueries({ queryKey: productKeys.detail(data.product._id) })
+    },
+  })
+}
+
+export function useUpdateProduct() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateProductInput }) =>
+      updateProduct(id, data),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: productKeys.detail(res.product._id) })
     },
   })
 }
