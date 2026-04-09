@@ -36,7 +36,7 @@ export default function EditProductPageContent({ id }: Props) {
   });
 
   // Existing images from the server (URLs)
-  const [status, setStatus] = useState<ProductStatus>(ProductStatus.AVAILABLE);
+  const [status, setStatus] = useState<ProductStatus>(ProductStatus.VISIBLE);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   // New files picked by the user
   const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
@@ -344,7 +344,7 @@ export default function EditProductPageContent({ id }: Props) {
               value={status}
               onChange={(e) => setStatus(e.target.value as ProductStatus)}
             >
-              <option value={ProductStatus.AVAILABLE}>Available</option>
+              <option value={ProductStatus.VISIBLE}>Available</option>
               <option value={ProductStatus.OUT_OF_STOCK}>Out of stock</option>
             </select>
           </div>
