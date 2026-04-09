@@ -33,7 +33,7 @@ const heroSections: HeroSlide[] = [
     title: "SKYFALL",
     tagline: "Coming Soon to Your Screen",
     backgroundImage: "/skyfall_hero_bg.png",
-    backgroundVideo: "https://res.cloudinary.com/dowr5xre6/video/upload/v1775723278/new-opening-corrected-3_pjC8oW6H_sabxun.mp4",
+    backgroundVideo: "https://res.cloudinary.com/dowr5xre6/video/upload/v1775721971/Website_Showreel_2_cfjcw8.mp4",
     buttons: [
       { text: "WATCH SHOWREEL", href: "#showreel", action: "showreel", variant: "solid" },
       { text: "START A PROJECT", href: "/contact", variant: "outline" },
@@ -96,7 +96,7 @@ const heroSections: HeroSlide[] = [
   },
 ];
 
-const SHOWREEL_URL = "https://res.cloudinary.com/dowr5xre6/video/upload/v1775723278/new-opening-corrected-3_pjC8oW6H_sabxun.mp4";
+const SHOWREEL_URL = "https://res.cloudinary.com/dowr5xre6/video/upload/v1775721971/Website_Showreel_2_cfjcw8.mp4";
 
 const fadeUpVariants = {
   hidden: { opacity: 0, y: 30 },
