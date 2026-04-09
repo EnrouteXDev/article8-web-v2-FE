@@ -17,48 +17,99 @@ interface Person {
 const people: Person[] = [
   {
     id: 1,
-    name: "Femi Adeyemi",
-    team: "ANYWORK",
-    image: "/demo.jpg",
-    linkedin: "#",
-    twitter: "#",
+    name: "Aanu Obadina",
+    team: "DIRECTOR / PRODUCER",
+    image: "/team-members/Director 3D.jpg",
   },
   {
     id: 2,
-    name: "Olumide Johnson",
-    team: "ENGINEERING",
-    image: "/demo.jpg",
-    linkedin: "#",
+    name: "Abimbola Oladipo",
+    team: "ILLUSTRATOR & VISUAL ARTIST",
+    image: "/team-members/Abimbola 3D.jpg",
   },
   {
     id: 3,
-    name: "Lanre Williams",
-    team: "OPERATIONS",
-    image: "/demo.jpg",
-    linkedin: "#",
-    twitter: "#",
+    name: "Ruth Owota",
+    team: "ILLUSTRATOR & VISUAL ARTIST",
+    image: "/team-members/Ruth 3D.jpg",
   },
   {
     id: 4,
-    name: "Tomilola Adebayo",
-    team: "BUSINESS",
-    image: "/demo.jpg",
-    linkedin: "#",
+    name: "Olatunbosun Ojomo",
+    team: "MODELING & RIGGING ARTIST",
+    image: "/team-members/Bosun 3D.jpg",
   },
   {
     id: 5,
-    name: "Amaka Okonkwo",
-    team: "GROWTH",
-    image: "/demo.jpg",
-    linkedin: "#",
-    twitter: "#",
+    name: "Joshua Nwambe",
+    team: "MODELING & LIGHTING ARTIST",
+    image: "/team-members/Joshua 3D.jpg",
   },
   {
     id: 6,
-    name: "Damian Okoro",
-    team: "GROWTH",
-    image: "/demo.jpg",
-    linkedin: "#",
+    name: "Ozioma Edeh",
+    team: "MODELING & LIGHTING ARTIST",
+    image: "/team-members/Ozzy 3D.jpg",
+  },
+  {
+    id: 7,
+    name: "Jide Adewusi",
+    team: "3D GENERALIST & TECHNICAL ARTIST",
+    image: "/team-members/Jide 3D.jpg",
+  },
+  {
+    id: 8,
+    name: "Ponmile Akinte",
+    team: "3D GENERALIST & LIGHTING ARTIST",
+    image: "/team-members/Ponmile 3D.jpg",
+  },
+  {
+    id: 9,
+    name: "Glory Danhusi",
+    team: "3D ANIMATOR & GENERALIST",
+    image: "/team-members/Glory 3D.jpg",
+  },
+  {
+    id: 10,
+    name: "Joseph Ita",
+    team: "STORY & BUSINESS DEVELOPMENT",
+    image: "/team-members/Joseph 3D.jpg",
+  },
+  {
+    id: 11,
+    name: "Onyekachi Eneh",
+    team: "3D ANIMATOR",
+    image: "/team-members/Onyekachi 3D.jpg",
+  },
+  {
+    id: 12,
+    name: "Paschal Buzo",
+    team: "3D ANIMATOR",
+    image: "/team-members/Paschal 3D.jpg",
+  },
+  {
+    id: 13,
+    name: "Henry Ephraim",
+    team: "3D ANIMATOR",
+    image: "/team-members/Henry 3D.jpg",
+  },
+  {
+    id: 14,
+    name: "Treasure Oriasotie",
+    team: "3D ANIMATOR",
+    image: "/team-members/Treasure 3D.jpg",
+  },
+  {
+    id: 15,
+    name: "Michael Onyeme",
+    team: "3D ANIMATOR",
+    image: "/team-members/Michael 3D.png",
+  },
+  {
+    id: 16,
+    name: "Hamzah Shuaib",
+    team: "3D ANIMATOR",
+    image: "/team-members/Abimbola 3D.jpg",
   },
 ];
 
@@ -66,7 +117,7 @@ export default function PeopleSection() {
   const [hoveredPerson, setHoveredPerson] = useState<Person>(people[0]);
 
   return (
-    <section className="w-full py-16 bg-background overflow-hidden">
+    <section className="w-full py-16 bg-background">
       <div className="flex flex-col gap-12">
         {/* Header */}
         <div className="section-px">
@@ -155,7 +206,7 @@ export default function PeopleSection() {
         <div className="section-px">
           <div className="hidden lg:grid lg:grid-cols-2 gap-16 section-container">
             {/* Left: Fixed Image */}
-            <div className="relative aspect-[3/4] rounded-[32px] overflow-hidden bg-gray-200 sticky top-24">
+            <div className="relative aspect-[3/4] rounded-[32px] overflow-hidden bg-gray-200 sticky top-24 self-start">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={hoveredPerson.id}
