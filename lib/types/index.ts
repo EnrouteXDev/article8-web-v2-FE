@@ -27,6 +27,16 @@ export enum ProductStatus {
   OUT_OF_STOCK = 'out of stock',
 }
 
+export enum ProductAvailability {
+  AVAILABLE = 'available',
+  OUT_OF_STOCK = 'out_of_stock',
+}
+
+export enum ProductPriceSort {
+  LOW_TO_HIGH = 'low_to_high',
+  HIGH_TO_LOW = 'high_to_low',
+}
+
 // ─── Entities ─────────────────────────────────────────────────────────────────
 
 export interface Admin {
@@ -90,6 +100,11 @@ export interface UpdateProductInput {
 export interface ProductFilters {
   search?: string
   status?: ProductStatus
+  category?: string
+  minPrice?: number
+  maxPrice?: number
+  availability?: ProductAvailability
+  priceSort?: ProductPriceSort
   page?: number
   limit?: number
 }
