@@ -1,4 +1,4 @@
-import type { CategoryFilters, OrderFilters, ProductFilters } from '@/lib/types'
+import type { CategoryFilters, OrderFilters, ProductFilters, ReviewFilters } from '@/lib/types'
 
 export const cartKeys = {
   all: ['cart'] as const,
@@ -30,6 +30,14 @@ export const supportKeys = {
   lists: () => [...supportKeys.all, 'list'] as const,
   list: (status?: string, page?: number, limit?: number) =>
     [...supportKeys.lists(), status, page, limit] as const,
+}
+
+export const reviewKeys = {
+  all: ['reviews'] as const,
+  lists: () => [...reviewKeys.all, 'list'] as const,
+  list: (filters: ReviewFilters) => [...reviewKeys.lists(), filters] as const,
+  product: (productId: string, page?: number, limit?: number) =>
+    [...reviewKeys.all, 'product', productId, page, limit] as const,
 }
 
 export const orderKeys = {

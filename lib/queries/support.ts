@@ -1,7 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getSupportTickets, replySupportTicket } from '@/lib/api/support'
+import { createSupportTicket, getSupportTickets, replySupportTicket } from '@/lib/api/support'
 import { supportKeys } from '@/lib/query-keys'
-import type { ReplySupportTicketInput, SupportTicketStatus } from '@/lib/types'
+import type { CreateSupportTicketInput, ReplySupportTicketInput, SupportTicketStatus } from '@/lib/types'
+
+export function useCreateSupportTicket() {
+  return useMutation({
+    mutationFn: (data: CreateSupportTicketInput) => createSupportTicket(data),
+  })
+}
 
 export function useSupportTickets(status?: SupportTicketStatus, page?: number, limit?: number) {
   return useQuery({
