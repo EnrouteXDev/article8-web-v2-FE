@@ -1,67 +1,54 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Send, Star, X } from "lucide-react";
+import { Star, X } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
+import type { AdminReview } from "@/lib/types";
 
-export type ReviewStatus = "Visible" | "Hidden";
-
-export interface ProductReview {
-  id: string;
-  customer: string;
-  reviewerName: string;
-  date: string;
-  detailDate: string;
-  product: string;
-  image: string;
-  excerpt: string;
-  fullReview: string;
-  rating: number;
-  status: ReviewStatus;
-}
-
-function ReviewStars({
-  rating,
-  size = "size-4",
-}: {
-  rating: number;
-  size?: string;
-}) {
+function ReviewStars({ rating, size = "size-4" }: { rating: number; size?: string }) {
   return (
     <div className="flex items-center gap-1">
-      {Array.from({ length: 5 }, (_, index) => {
-        const filled = index < rating;
-
-        return (
-          <Star
-            key={index}
-            className={cn(
-              size,
-              filled ? "fill-[#F59E0B] text-[#F59E0B]" : "fill-gray-200 text-gray-200"
-            )}
-          />
-        );
-      })}
+      {Array.from({ length: 5 }, (_, index) => (
+        <Star
+          key={index}
+          className={cn(
+            size,
+            index < rating ? "fill-[#F59E0B] text-[#F59E0B]" : "fill-gray-200 text-gray-200"
+          )}
+        />
+      ))}
     </div>
   );
+}
+
+function formatDetailDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 export default function ReviewDetailPanel({
   review,
   onClose,
-  onStatusChange,
+  onHide,
+  isHiding,
 }: {
-  review: ProductReview;
+  review: AdminReview;
   onClose: () => void;
-  onStatusChange: (status: ReviewStatus) => void;
+  onHide: (reviewId: string) => void;
+  isHiding?: boolean;
 }) {
-  const isVisible = review.status === "Visible";
-  const initials = review.reviewerName
+  const initials = review.userName
     .split(" ")
-    .map((part) => part[0])
+    .map((p) => p[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
+  const productImage = review.product?.images?.[0];
 
   return (
     <>
@@ -72,13 +59,12 @@ export default function ReviewDetailPanel({
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ ease: [0.22, 1, 0.36, 1], duration: 0.3 }}
-        className="fixed inset-y-0 right-0 z-40 flex w-[340px] flex-col border-l border-gray-200 bg-white shadow-xl"
+        className="fixed inset-y-0 right-0 z-40 flex w-full md:w-[340px] flex-col border-l border-gray-200 bg-white shadow-xl"
         style={{ fontFamily: "var(--font-satoshi)" }}
       >
+        {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-          <h2 className="text-[28px] font-bold tracking-tight text-[#1A1A1A]">
-            Review
-          </h2>
+          <h2 className="text-[28px] font-bold tracking-tight text-[#1A1A1A]">Review</h2>
           <button
             onClick={onClose}
             className="rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
@@ -87,82 +73,82 @@ export default function ReviewDetailPanel({
           </button>
         </div>
 
-        <div className="flex flex-1 flex-col justify-between px-5 py-5">
-          <div>
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-9 items-center justify-center rounded-full bg-[#F4C7B8] text-xs font-bold text-[#7A3A28]">
-                  {initials}
-                </div>
-                <span className="text-sm font-medium text-[#1A1A1A]">
-                  {review.reviewerName}
-                </span>
+        <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-5 py-5">
+          {/* Reviewer */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex size-9 items-center justify-center rounded-full bg-[#F4C7B8] text-xs font-bold text-[#7A3A28]">
+                {initials}
               </div>
-
-              <button
-                type="button"
-                role="switch"
-                aria-checked={isVisible}
-                onClick={() =>
-                  onStatusChange(isVisible ? "Hidden" : "Visible")
-                }
-                className={cn(
-                  "flex items-center gap-2 text-xs font-medium text-[#50535B]",
-                  !isVisible && "text-gray-400"
-                )}
-              >
-                <span
-                  className={cn(
-                    "relative inline-flex h-[18px] w-7 items-center rounded-full transition-colors",
-                    isVisible ? "bg-[#E53E52]" : "bg-gray-300"
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "inline-block size-3 rounded-full bg-white transition-transform",
-                      isVisible ? "translate-x-3.5" : "translate-x-0.5"
-                    )}
-                  />
-                </span>
-                {review.status}
-              </button>
+              <div>
+                <p className="text-sm font-medium text-[#1A1A1A]">{review.userName}</p>
+                <p className="text-xs text-[#667085]">{review.userEmail}</p>
+              </div>
             </div>
 
-            <p className="mt-5 text-[22px] leading-8 text-[#1A1A1A]">
-              &quot;{review.fullReview}&quot;
-            </p>
+            {/* Status badge */}
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] font-medium",
+                review.isHidden
+                  ? "bg-[#F2F4F7] text-[#667085]"
+                  : "bg-[#ECFDF3] text-[#027A48]"
+              )}
+            >
+              <span
+                className={cn(
+                  "size-1.5 rounded-full",
+                  review.isHidden ? "bg-[#98A2B3]" : "bg-[#12B76A]"
+                )}
+              />
+              {review.isHidden ? "Hidden" : "Visible"}
+            </span>
+          </div>
 
-            <div className="mt-4">
+          {/* Product */}
+          <div className="flex items-center gap-3 rounded-xl border border-gray-100 p-3">
+            <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+              {productImage ? (
+                <Image src={productImage} alt={review.productName} fill className="object-cover" />
+              ) : (
+                <div className="flex h-full items-center justify-center text-gray-300 text-xs">No img</div>
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[#1A1A1A]">{review.productName}</p>
+              <p className="text-xs text-[#667085]">Qty ordered: {review.quantityOrdered}</p>
+            </div>
+          </div>
+
+          {/* Review content */}
+          <div>
+            <p className="text-[20px] leading-8 text-[#1A1A1A]">
+              &quot;{review.comment}&quot;
+            </p>
+            <div className="mt-3">
               <ReviewStars rating={review.rating} />
             </div>
-
-            <p className="mt-3 text-xs text-[#666B78]">{review.detailDate}</p>
+            <p className="mt-2 text-xs text-[#666B78]">{formatDetailDate(review.createdAt)}</p>
           </div>
 
-          <div className="mt-10">
-            <div className="mb-3 flex items-center gap-3">
-              <div className="flex size-8 items-center justify-center rounded-full bg-[#E4B29D] text-xs font-bold text-[#7A3A28]">
-                A
-              </div>
-              <span className="text-sm font-medium text-[#1A1A1A]">
-                Reply review
-              </span>
+          {/* Order ref */}
+          {review.order?.orderNumber && (
+            <div className="rounded-lg bg-gray-50 px-3 py-2 text-xs text-[#667085]">
+              Order: <span className="font-medium text-[#344054]">{review.order.orderNumber}</span>
             </div>
+          )}
 
-            <div className="rounded-xl border border-gray-200">
-              <textarea
-                rows={4}
-                placeholder="Type message..."
-                className="min-h-28 w-full resize-none rounded-t-xl px-4 py-3 text-sm text-gray-700 outline-none placeholder:text-gray-400"
-              />
-              <div className="flex justify-end border-t border-gray-100 px-3 py-2">
-                <button className="inline-flex items-center gap-2 rounded-lg bg-[#09062A] px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#151043]">
-                  <Send className="size-3.5" />
-                  Send
-                </button>
-              </div>
-            </div>
-          </div>
+          {/* Hide action */}
+          {!review.isHidden && (
+            <button
+              type="button"
+              disabled={isHiding}
+              onClick={() => onHide(review.id)}
+              className="mt-auto w-full rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 disabled:opacity-50"
+            >
+              {isHiding ? "Hiding…" : "Hide review"}
+            </button>
+          )}
         </div>
       </motion.aside>
     </>

@@ -397,3 +397,75 @@ export interface SupportTicketsResponse {
 export interface ReplySupportTicketInput {
   reply: string
 }
+
+export interface CreateSupportTicketInput {
+  orderId: string
+  productId: string
+  complaint: string
+  images?: string[]
+}
+
+// ─── Reviews ──────────────────────────────────────────────────────────────────
+
+export interface AdminReview {
+  id: string
+  rating: number
+  comment: string
+  product: Product
+  order: { _id: string; orderNumber: string }
+  userName: string
+  userEmail: string
+  productName: string
+  quantityOrdered: number
+  isHidden: boolean
+  hiddenAt?: string
+  createdAt: string
+}
+
+export interface PublicReview {
+  id: string
+  rating: number
+  comment: string
+  productId: string
+  orderId: string
+  userName: string
+  productName: string
+  quantityOrdered: number
+  isHidden: boolean
+  createdAt: string
+}
+
+export interface ReviewFilters {
+  page?: number
+  limit?: number
+  userName?: string
+  productName?: string
+  userEmail?: string
+  isHidden?: boolean
+}
+
+export interface AdminReviewsResponse {
+  message: string
+  data: AdminReview[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface PublicReviewsResponse {
+  message: string
+  data: PublicReview[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+  averageRating: number
+}
+
+export interface CreateReviewInput {
+  orderId: string
+  productId: string
+  rating: number
+  comment: string
+}

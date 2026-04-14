@@ -19,6 +19,7 @@ import { ShoppingCart01Icon } from "hugeicons-react";
 import { toast } from "sonner";
 import { useProduct, useProducts } from "@/lib/queries/products";
 import { useAddToCart, useCart, useUpdateCartItem, useRemoveCartItem } from "@/lib/queries/cart";
+import { useProductReviews } from "@/lib/queries/reviews";
 import { Spinner } from "@/components/ui/spinner";
 import { ProductStatus } from "@/lib/types";
 import ProductReviews from "./ProductReviews";
@@ -73,6 +74,10 @@ export default function ProductDetailContent({ id }: Props) {
   const { mutate: addToCart, isPending: isAdding } = useAddToCart();
   const { mutate: updateItem, isPending: isUpdating } = useUpdateCartItem();
   const { mutate: removeItem, isPending: isRemoving } = useRemoveCartItem();
+
+  const { data: reviewsData } = useProductReviews(id, 1, 1);
+  const averageRating = reviewsData?.averageRating ?? 0;
+  const reviewCount = reviewsData?.total ?? 0;
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [localQty, setLocalQty] = useState(1);
@@ -206,13 +211,28 @@ export default function ProductDetailContent({ id }: Props) {
                     <div className="flex items-center gap-2 text-primary/40 shrink-0">
                       <button
                         className="hover:text-primary transition-colors"
-                        onClick={() => {
+                        onClick={async () => {
                           const url = window.location.href;
                           if (navigator.share) {
-                            navigator.share({ title: product.name, url });
+                            try {
+                              await navigator.share({
+                                title: product.name,
+                                text: `Check out ${product.name} on Article 8 Media Studios`,
+                                url,
+                              });
+                            } catch (err: any) {
+                              // AbortError means user dismissed — not an error
+                              if (err?.name !== "AbortError") {
+                                toast.error("Couldn't share. Try copying the link.");
+                              }
+                            }
                           } else {
-                            navigator.clipboard.writeText(url);
-                            toast.success("Link copied to clipboard");
+                            try {
+                              await navigator.clipboard.writeText(url);
+                              toast.success("Link copied to clipboard");
+                            } catch {
+                              toast.error("Couldn't copy link. Please copy it manually.");
+                            }
                           }
                         }}
                       >
@@ -228,12 +248,14 @@ export default function ProductDetailContent({ id }: Props) {
 
                   {/* Rating + location */}
                   <div className="flex items-center gap-4 flex-wrap">
-                    <div className="flex items-center gap-1.5">
-                      <StarRating rating={5} />
-                      <span className="font-satoshi text-sm text-primary/60">
-                        5.0 · 200 Reviews
-                      </span>
-                    </div>
+                    {reviewCount > 0 && (
+                      <div className="flex items-center gap-1.5">
+                        <StarRating rating={Math.round(averageRating)} />
+                        <span className="font-satoshi text-sm text-primary/60">
+                          {averageRating.toFixed(1)} · {reviewCount} review{reviewCount !== 1 ? "s" : ""}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-1 text-primary/50">
                       <MapPin size={14} />
                       <span className="font-satoshi text-sm">Manchester</span>
@@ -358,7 +380,7 @@ export default function ProductDetailContent({ id }: Props) {
 
               {/* ── Bottom: reviews + shipping ── */}
               <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 mb-20">
-                <ProductReviews />
+                <ProductReviews productId={id} />
                 <ProductPolicies />
               </div>
 

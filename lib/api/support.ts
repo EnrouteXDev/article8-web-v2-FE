@@ -1,9 +1,18 @@
 import { client } from './client'
 import type {
+  CreateSupportTicketInput,
   ReplySupportTicketInput,
   SupportTicketsResponse,
   SupportTicketStatus,
+  MessageResponse,
 } from '@/lib/types'
+
+export async function createSupportTicket(
+  data: CreateSupportTicketInput,
+): Promise<MessageResponse> {
+  const response = await client.post<MessageResponse>('/support-ticket', data)
+  return response.data
+}
 
 export async function getSupportTickets(
   status?: SupportTicketStatus,
