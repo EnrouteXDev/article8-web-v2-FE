@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip -o \"OneDrive_1_4-15-2026.zip\" -d \"./onedrive_1\")",
+      "Bash(unzip -o \"OneDrive_2_4-15-2026.zip\" -d \"./onedrive_2\")",
+      "Bash(unzip -o \"OneDrive_4_4-15-2026.zip\" -d \"./onedrive_4\")"
+    ]
+  }
+}

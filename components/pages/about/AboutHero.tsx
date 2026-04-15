@@ -1,4 +1,3 @@
-import React from "react";
 import Image from "next/image";
 
 export default function AboutHero() {
@@ -7,7 +6,7 @@ export default function AboutHero() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/heroBg.jpg"
+          src="/OneDrive_1_4-15-2026 (1)/About Us.png"
           alt="About Us Hero Background"
           fill
           className="object-cover"

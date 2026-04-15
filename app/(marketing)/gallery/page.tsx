@@ -1,4 +1,3 @@
-import React from "react";
 import PageHero from "@/components/shared/PageHero";
 import GalleryMediaSection from "@/components/pages/gallery/GalleryMediaSection";
 
@@ -8,6 +7,7 @@ export default function Gallery() {
       <PageHero
         title="Gallery"
         description="Take a walk through our visual journey, where our ideas live."
+        image="/OneDrive_1_4-15-2026 (1)/Gallery.png"
       />
 
       <GalleryMediaSection />
