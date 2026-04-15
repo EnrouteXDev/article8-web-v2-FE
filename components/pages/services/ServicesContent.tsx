@@ -1,8 +1,8 @@
 "use client"
-import React, { useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import SectionHeader from "@/components/shared/headers/SectionHeader";
-import { ArrowDown01Icon, ArrowRight01Icon } from "hugeicons-react";
+import { ArrowDown01Icon } from "hugeicons-react";
 
 interface SubService {
   title: string;
@@ -14,6 +14,7 @@ interface ServiceItem {
   title: string;
   subtitle: string;
   image: string;
+  mediaType?: "image" | "video";
   subServices: SubService[];
 }
 
@@ -22,7 +23,8 @@ const services: ServiceItem[] = [
     id: "01",
     title: "Animation & Motion Design",
     subtitle: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling.",
-    image: "/demo.jpg",
+    image: "/onedrive_4/Skyfall title.mp4",
+    mediaType: "video",
     subServices: [
       { title: "2D Explainer Videos", description: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling." },
       { title: "Character Animation & Rigging" },
@@ -34,7 +36,8 @@ const services: ServiceItem[] = [
     id: "02",
     title: "3D Modelling, Visualization & Interactive Media",
     subtitle: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling.",
-    image: "/demo.jpg",
+    image: "/3dmodeling.mp4",
+    mediaType: "video",
     subServices: [
       { title: "2D Explainer Videos", description: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling." },
       { title: "Character Animation & Rigging" },
@@ -58,7 +61,8 @@ const services: ServiceItem[] = [
     id: "04",
     title: "Film, Audio & Post-Production",
     subtitle: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling.",
-    image: "/demo.jpg",
+    image: "/onedrive_4/Skyfall title.mp4",
+    mediaType: "video",
     subServices: [
       { title: "2D Explainer Videos", description: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling." },
       { title: "Character Animation & Rigging" },
@@ -121,14 +125,25 @@ export default function ServicesContent() {
               {/* Expanded Content */}
               <div className={`overflow-hidden transition-all duration-500 ease-in-out ${openIds.includes(service.id) ? 'max-h-[2000px] mb-12' : 'max-h-0'}`}>
                 <div className="flex flex-col gap-12 ">
-                  {/* Large Image */}
+                  {/* Large Media */}
                   <div className="relative w-full aspect-video lg:aspect-21/9 rounded-[24px] overflow-hidden">
-                    <Image
-                      src={service.image}
-                      alt={service.title}
-                      fill
-                      className="object-cover"
-                    />
+                    {service.mediaType === "video" ? (
+                      <video
+                        src={service.image}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Image
+                        src={service.image}
+                        alt={service.title}
+                        fill
+                        className="object-cover"
+                      />
+                    )}
                   </div>
 
                   {/* Sub-services List */}

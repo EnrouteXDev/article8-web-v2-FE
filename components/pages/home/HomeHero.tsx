@@ -55,7 +55,7 @@ const heroSections: HeroSlide[] = [
     index: "03",
     title: "CROWDFUNDING SUPPORT",
     tagline: "Get Involved",
-    backgroundImage: "/hero-media/Illustration32 1.png",
+    backgroundImage: "/hero-media/Illustration32.png",
     buttons: [
       { text: "GET INVOLVED", href: "#campaign", variant: "solid" },
     ],
@@ -329,11 +329,11 @@ export default function HomeHero() {
               </motion.div>
 
               {/* Bottom Label */}
-              <div className="absolute bottom-8 lg:bottom-16 left-4 md:left-16 z-20 hidden sm:block">
+              {/* <div className="absolute bottom-8 lg:bottom-16 left-4 md:left-16 z-20 hidden sm:block">
                 <p className="font-satoshi font-normal text-white/70 text-xs md:text-sm lg:text-lg uppercase tracking-wider">
                   CREATIONS / WORKS WE HAVE DONE
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
         )}
