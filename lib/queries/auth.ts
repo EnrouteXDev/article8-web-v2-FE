@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
-import { loginAdmin, forgotPassword, resetPassword } from '@/lib/api/auth'
+import { loginAdmin, forgotPassword, resetPassword, inviteAdmin } from '@/lib/api/auth'
 import { useAuthStore } from '@/lib/stores/auth'
-import type { LoginInput, ForgotPasswordInput, ResetPasswordInput } from '@/lib/types'
+import type { LoginInput, ForgotPasswordInput, ResetPasswordInput, InviteAdminInput } from '@/lib/types'
 
 export function useLoginAdmin() {
   const router = useRouter()
@@ -33,5 +33,11 @@ export function useResetPassword() {
     onSuccess: () => {
       router.push('/admin/login')
     },
+  })
+}
+
+export function useInviteAdmin() {
+  return useMutation({
+    mutationFn: (data: InviteAdminInput) => inviteAdmin(data),
   })
 }
