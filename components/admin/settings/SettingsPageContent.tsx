@@ -16,7 +16,7 @@ export default function SettingsPageContent() {
   const [activeTab, setActiveTab] = useState<Tab>("profile");
 
   return (
-    <AdminPage className="flex flex-col gap-6" style={{ fontFamily: "var(--font-satoshi)" }}>
+    <AdminPage className="flex flex-col gap-6">
       <div className="rounded-xl bg-white shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
         {/* Tabs */}
         <div className="flex border-b border-[#F2F4F7] px-6">
