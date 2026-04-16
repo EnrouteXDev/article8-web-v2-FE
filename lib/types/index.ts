@@ -4,16 +4,19 @@ export enum AdminRole {
   SUPER_ADMIN = 'super_admin',
   CUSTOMER_SUPPORT = 'customer_support',
   SITE_ADMIN = 'site_admin',
+  MEMBER = 'member',
 }
 
 export enum AdminPermission {
   ALL = 'all',
+  INVITE = 'invite',
   SUPPORT = 'support',
   PRODUCT = 'product',
   CATEGORY = 'category',
   REVIEW = 'review',
   RULES = 'rules',
   POLICY = 'policy',
+  BLOG = 'blog',
 }
 
 export enum ReturnRule {
@@ -76,6 +79,30 @@ export interface Category {
 export interface LoginInput {
   email: string
   password: string
+}
+
+export interface InviteAdminInput {
+  firstname: string
+  lastname: string
+  email: string
+  role: AdminRole
+}
+
+export interface AdminUser {
+  id: string
+  name: string
+  email: string
+  role: AdminRole
+  lastActive: string | null
+}
+
+export interface AdminUsersResponse {
+  message: string
+  data: AdminUser[]
+}
+
+export interface UpdateAdminRoleInput {
+  role: AdminRole
 }
 
 export interface CreateProductInput {

@@ -32,6 +32,10 @@ export const supportKeys = {
     [...supportKeys.lists(), status, page, limit] as const,
 }
 
+export const adminUserKeys = {
+  all: ['admin-users'] as const,
+}
+
 export const reviewKeys = {
   all: ['reviews'] as const,
   lists: () => [...reviewKeys.all, 'list'] as const,
