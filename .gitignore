@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.agents/
 /out/
 
 # production
@@ -39,3 +40,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Large video files - host on Cloudinary
+public/hero-media/*.mp4
+public/hero-media/*.MP4
+
+# Local backup snapshots
+/.asset-backups/

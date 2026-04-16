@@ -48,3 +48,28 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Quill editor overrides */
+.ql-toolbar.ql-snow {
+  border: none;
+  border-bottom: 1px solid #f3f4f6;
+  background: #f9fafb;
+  padding: 8px 12px;
+}
+
+.ql-container.ql-snow {
+  border: none;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.ql-editor {
+  min-height: 200px;
+  padding: 12px 16px;
+  color: #1f2937;
+}
+
+.ql-editor.ql-blank::before {
+  color: #9ca3af;
+  font-style: normal;
+}

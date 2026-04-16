@@ -1,4 +1,3 @@
-import React from "react";
 import PageHero from "@/components/shared/PageHero";
 import ContactSection from "@/components/pages/home/ContactSection";
 
@@ -8,6 +7,7 @@ export default function Contact() {
       <PageHero
         title="Contact Us"
         description="Have an Idea? We're ready to listen, collaborate, and create extraordinary."
+        image="/OneDrive_1_4-15-2026 (1)/Contact.png"
       />
 
       {/* Existing Contact Section */}

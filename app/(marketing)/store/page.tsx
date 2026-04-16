@@ -1,4 +1,3 @@
-import React from "react";
 import PageHero from "@/components/shared/PageHero";
 import StoreContent from "@/components/pages/store/StoreContent";
 
@@ -8,9 +7,9 @@ export default function Store() {
       <PageHero
         title="Store"
         description="Our selection of curated items for your space."
+        image="/OneDrive_1_4-15-2026 (1)/Store.png"
       />
       <StoreContent />
-      {/* Additional Store Page Content will go here */}
     </main>
   );
 }

@@ -1,18 +1,18 @@
-import React from "react";
 import Image from "next/image";
 
 interface PageHeroProps {
   title: string;
   description: string;
+  image?: string;
 }
 
-export default function PageHero({ title, description }: PageHeroProps) {
+export default function PageHero({ title, description, image = "/heroBg.jpg" }: PageHeroProps) {
   return (
     <section className="relative w-full h-[80vh] min-h-[700px]">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/heroBg.jpg"
+          src={image}
           alt={`${title} Hero Background`}
           fill
           className="object-cover"

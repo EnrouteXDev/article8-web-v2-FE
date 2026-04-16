@@ -1,7 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import LoginForm from "@/components/admin/LoginForm";
 
 export const metadata = {
   title: "Admin Login",
@@ -53,54 +51,7 @@ export default function AdminLoginPage() {
           />
 
           {/* Fields */}
-          <div className="w-full max-w-90 flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="email"
-                className="text-sm text-gray-700"
-                style={{ fontFamily: "var(--font-satoshi)" }}
-              >
-                Email
-              </label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Email address"
-                className="h-11 rounded-lg border-gray-200 text-sm"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="password"
-                className="text-sm text-gray-700"
-                style={{ fontFamily: "var(--font-satoshi)" }}
-              >
-                Password
-              </label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Password"
-                className="h-11 rounded-lg border-gray-200 text-sm"
-              />
-            </div>
-
-            <Link
-              href="/admin/forgot-password"
-              className="text-sm text-primary hover:underline w-fit"
-              style={{ fontFamily: "var(--font-satoshi)" }}
-            >
-              Forgot password?
-            </Link>
-
-            <Button
-              className="w-full h-11 rounded-lg text-sm bg-primary hover:bg-primary/90 text-white mt-1"
-              style={{ fontFamily: "var(--font-satoshi)" }}
-            >
-              Login
-            </Button>
-          </div>
+          <LoginForm />
         </div>
 
         {/* Bottom spacer to balance the top bar */}

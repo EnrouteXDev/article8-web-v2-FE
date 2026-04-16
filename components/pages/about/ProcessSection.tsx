@@ -1,4 +1,3 @@
-import React from "react";
 import Image from "next/image";
 import SectionHeader from "@/components/shared/headers/SectionHeader";
 
@@ -14,19 +13,19 @@ const steps: ProcessStep[] = [
     id: "001",
     title: "Pre-Production",
     description: "This is where the foundation of every project is built. During pre-production, we focus on defining the story, tone, and visual direction before animation begins.",
-    image: "/demo.jpg"
+    image: "/onedrive_1/Pre-production.png"
   },
   {
     id: "002",
     title: "Production",
     description: "Production is where ideas are brought to life through animation and execution. At this stage, our team focuses on building, animating, and refining assets.",
-    image: "/demo.jpg"
+    image: "/onedrive_1/Production.png"
   },
   {
     id: "003",
     title: "Post-Production",
     description: "Post-production is where all elements come together to form the final experience. This stage focuses on polishing, enhancing, and finalizing the project.",
-    image: "/demo.jpg"
+    image: "/onedrive_1/Post-Production.png"
   }
 ];
 
