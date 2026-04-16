@@ -1,9 +1,10 @@
-import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
-import { loginAdmin, forgotPassword, resetPassword, inviteAdmin } from '@/lib/api/auth'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { loginAdmin, forgotPassword, resetPassword, inviteAdmin, getAdminUsers, updateAdminRole } from '@/lib/api/auth'
 import { useAuthStore } from '@/lib/stores/auth'
-import type { LoginInput, ForgotPasswordInput, ResetPasswordInput, InviteAdminInput } from '@/lib/types'
+import { adminUserKeys } from '@/lib/query-keys'
+import type { LoginInput, ForgotPasswordInput, ResetPasswordInput, InviteAdminInput, UpdateAdminRoleInput } from '@/lib/types'
 
 export function useLoginAdmin() {
   const router = useRouter()
@@ -37,7 +38,29 @@ export function useResetPassword() {
 }
 
 export function useInviteAdmin() {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: InviteAdminInput) => inviteAdmin(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminUserKeys.all })
+    },
+  })
+}
+
+export function useAdminUsers() {
+  return useQuery({
+    queryKey: adminUserKeys.all,
+    queryFn: getAdminUsers,
+  })
+}
+
+export function useUpdateAdminRole() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateAdminRoleInput }) =>
+      updateAdminRole(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminUserKeys.all })
+    },
   })
 }

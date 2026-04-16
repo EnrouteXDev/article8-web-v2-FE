@@ -88,6 +88,23 @@ export interface InviteAdminInput {
   role: AdminRole
 }
 
+export interface AdminUser {
+  id: string
+  name: string
+  email: string
+  role: AdminRole
+  lastActive: string | null
+}
+
+export interface AdminUsersResponse {
+  message: string
+  data: AdminUser[]
+}
+
+export interface UpdateAdminRoleInput {
+  role: AdminRole
+}
+
 export interface CreateProductInput {
   name: string
   url: string

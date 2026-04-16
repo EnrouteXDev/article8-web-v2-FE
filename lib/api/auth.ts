@@ -6,6 +6,8 @@ import type {
   ResetPasswordInput,
   MessageResponse,
   InviteAdminInput,
+  AdminUsersResponse,
+  UpdateAdminRoleInput,
 } from '@/lib/types'
 
 export async function loginAdmin(data: LoginInput): Promise<LoginResponse> {
@@ -25,5 +27,15 @@ export async function resetPassword(data: ResetPasswordInput): Promise<MessageRe
 
 export async function inviteAdmin(data: InviteAdminInput): Promise<MessageResponse> {
   const response = await client.post<MessageResponse>('/auth/admin/invite', data)
+  return response.data
+}
+
+export async function getAdminUsers(): Promise<AdminUsersResponse> {
+  const response = await client.get<AdminUsersResponse>('/admin/users')
+  return response.data
+}
+
+export async function updateAdminRole(id: string, data: UpdateAdminRoleInput): Promise<MessageResponse> {
+  const response = await client.patch<MessageResponse>(`/admin/users/${id}/role`, data)
   return response.data
 }
