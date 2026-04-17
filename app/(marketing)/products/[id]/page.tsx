@@ -11,4 +11,4 @@ export default function ProductDetailPage() {
   );
 }
 
-// random comment to trigger redeploy
+// random comment to trigger redeploy 2
