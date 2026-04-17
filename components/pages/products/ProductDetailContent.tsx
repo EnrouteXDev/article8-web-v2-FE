@@ -195,4 +195,4 @@ export default function ProductDetailContent() {
     </article>
   );
 }
-// junk so i can commit
+// junk so i can commit 2
