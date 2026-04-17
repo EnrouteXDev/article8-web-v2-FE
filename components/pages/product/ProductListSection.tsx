@@ -33,7 +33,7 @@ const MOCK_PRODUCTS: Record<string, Product[]> = {
     categoryLabel: "Animation & Motion Design",
     description:
       "Lorem ipsum dolor sit amet consectetur. Ut feugiat ipsum pulvinar odio tempor hac netus sagittis. Leo dui ut sit suspendisse augue tincidunt mus",
-    image: "/images/products/skyfall.png",
+    image: "/skyfall.png",
   })),
   "3D Modelling, Visualization & Interactive Media": Array.from({
     length: 5,
@@ -44,7 +44,7 @@ const MOCK_PRODUCTS: Record<string, Product[]> = {
     categoryLabel: "3D Modelling, Visualization & Interactive Media",
     description:
       "Immersive 3D environments designed for the next generation of interactive storytelling and digital exploration.",
-    image: "/images/products/skyfall.png",
+    image: "/skyfall.png",
   })),
   "Creative Development & Branding": Array.from({ length: 5 }).map((_, i) => ({
     id: `brand-${i}`,
@@ -53,7 +53,7 @@ const MOCK_PRODUCTS: Record<string, Product[]> = {
     categoryLabel: "Creative Development & Branding",
     description:
       "Crafting iconic brand identities that resonate with modern audiences through thoughtful design and strategy.",
-    image: "/images/products/skyfall.png",
+    image: "/skyfall.png",
   })),
   "Film, Audio & Post-Production": Array.from({ length: 5 }).map((_, i) => ({
     id: `film-${i}`,
@@ -62,7 +62,7 @@ const MOCK_PRODUCTS: Record<string, Product[]> = {
     categoryLabel: "Film, Audio & Post-Production",
     description:
       "High-end post-production services including color grading, sound design, and visual effects for film and commercials.",
-    image: "/images/products/skyfall.png",
+    image: "/skyfall.png",
   })),
 };
 
