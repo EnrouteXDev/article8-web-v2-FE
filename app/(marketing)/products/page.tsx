@@ -15,10 +15,6 @@ export default function Products() {
       <ProductListSection />
 
       <DiscussWithUsContainer />
-
-      {/* <ProjectStackingSection /> */}
-
-      {/* Additional Products Page Content will go here */}
-    </main>
+     </main>
   );
 }
