@@ -13,5 +13,9 @@ export default function ProductDetailPage() {
 <<<<<<< HEAD
 =======
 
+<<<<<<< HEAD
 // random comment to trigger redeploy
 >>>>>>> 2050ca7090aa2d19b932366dc4b24f91f60b3798
+=======
+// random comment to trigger redeploy 2
+>>>>>>> a80f1d6670085f4daabb258bd043ab09c34d962c
