@@ -7,7 +7,7 @@ export default function Contact() {
       <PageHero
         title="Contact Us"
         description="Have an Idea? We're ready to listen, collaborate, and create extraordinary."
-        image="/OneDrive_1_4-15-2026 (1)/Contact.png"
+        image="/OneDrive_1_8-6-2026 (1)/Contact Us.png"
       />
 
       {/* Existing Contact Section */}

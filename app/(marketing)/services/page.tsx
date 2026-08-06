@@ -7,7 +7,7 @@ export default function Services() {
       <PageHero
         title="Services"
         description="Explore our services"
-        image="/OneDrive_1_4-15-2026 (1)/Our Services.png"
+        image="/OneDrive_1_8-6-2026 (1)/Our Services.png"
       />
 
       <ServicesContent />

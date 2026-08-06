@@ -17,31 +17,52 @@ interface GalleryCategory {
   posts: MediaPost[];
 }
 
-const mockPosts: MediaPost[] = Array(6).fill(null).map((_, i) => ({
-  id: `post-${i}`,
-  image: "/demo.jpg",
-  title: "Media Post",
-  tags: ["Sky fall", "Heaven"]
-}));
+const galleryPost = (file: string, title: string, tags: string[]): MediaPost => ({
+  id: file,
+  image: `/OneDrive_1_8-6-2026/${file}`,
+  title,
+  tags,
+});
+
+const characterPosts: MediaPost[] = [
+  ["Abatan.jpg", "Abatan"],
+  ["Abioye.jpg", "Abioye"],
+  ["Adesua.jpg", "Adesua"],
+  ["Adesua_04.jpg", "Adesua"],
+  ["Adesua_05.jpg", "Adesua"],
+  ["Ashabi_cycles_01.jpg", "Ashabi Cycles"],
+  ["Ashabi_cycles_02.jpg", "Ashabi Cycles"],
+  ["Ashabi_cycles_03.jpg", "Ashabi Cycles"],
+  ["Babatunde.jpg", "Babatunde"],
+  ["Babatunde_01.jpg", "Babatunde"],
+  ["Babatunde_02.jpg", "Babatunde"],
+  ["Efunrewa_02.jpg", "Efunrewa"],
+  ["Oba abioye_Agbada_01.jpg", "Oba Abioye"],
+  ["Oba abioye_Agbada_02.jpg", "Oba Abioye"],
+  ["Oba abioye_Agbada_03.jpg", "Oba Abioye"],
+  ["Oba abioye_Agbada_04.jpg", "Oba Abioye"],
+  ["Oba abioye_Agbada_05.jpg", "Oba Abioye"],
+  ["Olumide_01.jpg", "Olumide"],
+].map(([file, title]) => galleryPost(file, title, ["Character"]));
+
+const environmentPosts: MediaPost[] = [
+  ["Palace interior.jpg", "Palace Interior"],
+  ["SENTENCING_HALL_02.jpg", "Sentencing Hall"],
+  ["The core.jpg", "The Core"],
+].map(([file, title]) => galleryPost(file, title, ["Environment"]));
 
 const categories: GalleryCategory[] = [
   {
     id: "01",
-    title: "Media work",
-    subtitle: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling.",
-    posts: mockPosts.slice(0, 3)
+    title: "Characters",
+    subtitle: "Character designs and renders from our animated worlds.",
+    posts: characterPosts
   },
   {
     id: "02",
-    title: "Media work",
-    subtitle: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling.",
-    posts: []
-  },
-  {
-    id: "03",
-    title: "Media work",
-    subtitle: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling.",
-    posts: mockPosts
+    title: "Environments",
+    subtitle: "Sets and environments that ground our stories.",
+    posts: environmentPosts
   }
 ];
 
@@ -121,7 +142,7 @@ export default function GalleryMediaSection() {
             </div>
 
             {/* Accordion Content */}
-            <div className={`overflow-hidden transition-all duration-500 ease-in-out ${openIds.includes(cat.id) ? 'max-h-[3000px] pb-16' : 'max-h-0'}`}>
+            <div className={`overflow-hidden transition-all duration-500 ease-in-out ${openIds.includes(cat.id) ? 'max-h-2500 pb-16' : 'max-h-0'}`}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                 {cat.posts.map((post, index) => (
                   <div key={post.id} className="flex flex-col gap-4">
@@ -134,7 +155,7 @@ export default function GalleryMediaSection() {
                         src={post.image}
                         alt={post.title}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover/item:scale-110"
+                        className="object-cover object-top transition-transform duration-500 group-hover/item:scale-110"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover/item:bg-black/20 transition-colors duration-300 flex items-center justify-center">
                         <span className="text-white opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 font-satoshi font-medium">View Project</span>
