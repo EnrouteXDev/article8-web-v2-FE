@@ -7,7 +7,7 @@ export default function Store() {
       <PageHero
         title="Store"
         description="Our selection of curated items for your space."
-        image="/OneDrive_1_4-15-2026 (1)/Store.png"
+        image="/OneDrive_1_8-6-2026 (1)/Store.png"
       />
       <StoreContent />
     </main>

@@ -6,7 +6,7 @@ export default function AboutHero() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/OneDrive_1_4-15-2026 (1)/About Us.png"
+          src="/OneDrive_1_8-6-2026 (1)/About Us.png"
           alt="About Us Hero Background"
           fill
           className="object-cover"

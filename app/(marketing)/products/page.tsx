@@ -10,6 +10,7 @@ export default function Products() {
       <PageHero
         title="Products"
         description="Wonder and enjoy the works we have done over the years"
+        image="/OneDrive_1_8-6-2026 (1)/Products.png"
       />
 
       <ProductListSection />
