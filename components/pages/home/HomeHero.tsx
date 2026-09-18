@@ -23,6 +23,8 @@ type HeroSlide = {
   backgroundVideo?: string;
   overlayImages?: string[];
   comingSoon?: boolean;
+  // Artwork already carries the text; show only the index and buttons
+  hideText?: boolean;
   buttons: HeroButton[];
 };
 
@@ -56,6 +58,7 @@ const heroSections: HeroSlide[] = [
     title: "CROWDFUNDING SUPPORT",
     tagline: "Get Involved",
     backgroundImage: "/hero-media/Illustration32.png",
+    hideText: true,
     buttons: [
       { text: "GET INVOLVED", href: "#campaign", variant: "solid" },
     ],
@@ -71,6 +74,7 @@ const heroSections: HeroSlide[] = [
       "/hero-media/Illustration32vx.png",
     ],
     comingSoon: true,
+    hideText: true,
     buttons: [],
   },
   {
@@ -93,6 +97,17 @@ const heroSections: HeroSlide[] = [
     backgroundImage: "/hero-media/Image.jfif",
     comingSoon: true,
     buttons: [],
+  },
+  {
+    id: 7,
+    index: "07",
+    title: "EXCLUSIVE OFFERS",
+    tagline: "Now Live in Our Store",
+    backgroundImage: "/OneDrive_1_8-6-2026 (1)/Store.png",
+    backgroundVideo: "https://res.cloudinary.com/dhlpbvjcx/video/upload/v1789746407/Offer_slideshow_cr0fns.mp4",
+    buttons: [
+      { text: "SHOP NOW", href: "/store", variant: "solid" },
+    ],
   },
 ];
 
@@ -252,6 +267,8 @@ export default function HomeHero() {
                   </span>
                 </motion.div>
 
+                {!slide.hideText && (
+                <>
                 {/* Tagline */}
                 <motion.p
                   variants={fadeUpVariants}
@@ -288,6 +305,8 @@ export default function HomeHero() {
                       Coming Soon
                     </span>
                   </motion.div>
+                )}
+                </>
                 )}
 
                 {/* Buttons */}

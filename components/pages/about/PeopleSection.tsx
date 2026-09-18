@@ -117,12 +117,12 @@ const people: Person[] = [
     team: "3D ANIMATOR",
     image: "/team-members/Michael.png",
   },
-  // {
-  //   id: 16,
-  //   name: "Hamzah Shuaib",
-  //   team: "3D ANIMATOR",
-  //   image: "/team-members/Abimbola 3D.jpg",
-  // },
+  {
+    id: 16,
+    name: "Hamzah Shuaib",
+    team: "3D ANIMATOR",
+    image: "/team-members/Hamzah.png",
+  },
 ];
 
 export default function PeopleSection() {
