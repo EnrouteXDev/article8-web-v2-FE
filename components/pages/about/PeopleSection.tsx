@@ -16,12 +16,6 @@ interface Person {
 
 const people: Person[] = [
   {
-    id: 1,
-    name: "Aanu Obadina",
-    team: "DIRECTOR / PRODUCER",
-    image: "/team-members/Aanu Obadina.png",
-  },
-  {
     id: 2,
     name: "Abimbola Oladipo",
     team: "ILLUSTRATOR & VISUAL ARTIST",
@@ -33,17 +27,11 @@ const people: Person[] = [
   //   team: "ILLUSTRATOR & VISUAL ARTIST",
   //   image: "/team-members/Ruth 3D.jpg",
   // },
-  // {
-  //   id: 4,
-  //   name: "Olatunbosun Ojomo",
-  //   team: "MODELING & RIGGING ARTIST",
-  //   image: "/team-members/Bosun 3D.jpg",
-  // },
   {
-    id: 5,
-    name: "Joshua Nwambe",
-    team: "MODELING & LIGHTING ARTIST",
-    image: "/team-members/Joshua.png",
+    id: 4,
+    name: "Bosun Ojomo",
+    team: "MODELING & RIGGING ARTIST",
+    image: "/team-members/Bosun.png",
   },
   {
     id: 6,
@@ -87,12 +75,6 @@ const people: Person[] = [
     team: "SOCIAL MEDIA MANAGER",
     image: "/team-members/Anne.png",
   },
-  {
-    id: 11,
-    name: "Onyekachi Eneh",
-    team: "3D ANIMATOR",
-    image: "/team-members/Kachi.png",
-  },
   // {
   //   id: 12,
   //   name: "Paschal Buzo",
@@ -122,6 +104,12 @@ const people: Person[] = [
     name: "Hamzah Shuaib",
     team: "3D ANIMATOR",
     image: "/team-members/Hamzah.png",
+  },
+  {
+    id: 1,
+    name: "Aanu Obadina",
+    team: "DIRECTOR / PRODUCER",
+    image: "/team-members/Aanu Obadina.png",
   },
 ];
 

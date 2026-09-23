@@ -115,13 +115,12 @@ export interface CreateProductInput {
 }
 
 export interface UpdateProductInput {
-  name?: string
-  url?: string
-  price?: number
-  quantity?: number
-  description?: string
-  images?: string[]
-  status?: ProductStatus
+  name: string
+  url: string
+  price: number
+  quantity: number
+  description: string
+  images: string[]
 }
 
 export interface ProductFilters {

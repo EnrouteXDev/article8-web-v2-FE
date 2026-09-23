@@ -12,7 +12,6 @@ import { useProduct, useUpdateProduct } from "@/lib/queries/products";
 import { Spinner } from "@/components/ui/spinner";
 import { editProductSchema, type EditProductFormValues } from "@/lib/schemas";
 import { uploadImages } from "@/lib/utils/cloudinary";
-import { ProductStatus } from "@/lib/types";
 
 interface Props {
   id: string;
@@ -36,7 +35,6 @@ export default function EditProductPageContent({ id }: Props) {
   });
 
   // Existing images from the server (URLs)
-  const [status, setStatus] = useState<ProductStatus>(ProductStatus.VISIBLE);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   // New files picked by the user
   const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
@@ -63,7 +61,6 @@ export default function EditProductPageContent({ id }: Props) {
       description: p.description,
     });
     setExistingImages(p.images ?? []);
-    setStatus(p.status);
   }, [data, reset]);
 
   const name = watch("name");
@@ -122,7 +119,6 @@ export default function EditProductPageContent({ id }: Props) {
           quantity: parseInt(values.quantity, 10),
           description: values.description,
           images: [...existingImages, ...uploadedUrls],
-          status,
         },
       },
       {
@@ -262,7 +258,12 @@ export default function EditProductPageContent({ id }: Props) {
                 <div className="flex items-center gap-2 flex-wrap">
                   {existingImages.map((src, i) => (
                     <div key={`existing-${i}`} className="relative size-24 rounded-lg overflow-hidden bg-gray-100 shrink-0 group">
-                      <Image src={src} alt={`Product image ${i + 1}`} fill className="object-cover" />
+                      {src.startsWith("http") ? (
+                        <Image src={src} alt={`Product image ${i + 1}`} fill className="object-cover" />
+                      ) : (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={src} alt={`Product image ${i + 1}`} className="w-full h-full object-cover" />
+                      )}
                       <button
                         type="button"
                         onClick={() => removeExisting(i)}
@@ -335,19 +336,6 @@ export default function EditProductPageContent({ id }: Props) {
             />
           </div>
 
-          {/* Status */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">Status</label>
-            <select
-              disabled={isBusy}
-              className="h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-800 outline-none focus:border-gray-400 transition-colors disabled:opacity-50 bg-white"
-              value={status}
-              onChange={(e) => setStatus(e.target.value as ProductStatus)}
-            >
-              <option value={ProductStatus.VISIBLE}>Available</option>
-              <option value={ProductStatus.OUT_OF_STOCK}>Out of stock</option>
-            </select>
-          </div>
         </div>
 
         {/* Preview */}
