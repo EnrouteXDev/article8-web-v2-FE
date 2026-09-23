@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Search,
   ChevronsUpDown,
@@ -13,6 +14,7 @@ import {
   ChevronDown,
   Trash2,
   EyeOff,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 import AdminPage from "@/components/admin/shared/AdminPage";
@@ -48,6 +50,7 @@ const STATUS_OPTIONS = [
 export default function DashboardPageContent() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const router = useRouter();
   const [status, setStatus] = useState<ProductStatus | undefined>(undefined);
   const [filterOpen, setFilterOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
@@ -210,6 +213,9 @@ export default function DashboardPageContent() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-white! z-50!">
                     <DropdownMenuGroup>
+                      <DropdownMenuItem onSelect={() => router.push(`/admin/products/${product._id}/edit`)}>
+                        <Pencil />Edit
+                      </DropdownMenuItem>
                       {product.status === ProductStatus.VISIBLE && (
                         <DropdownMenuItem onSelect={() => setHideTarget({ id: product._id, name: product.name })}>
                           <EyeOff />Hide
@@ -366,6 +372,12 @@ export default function DashboardPageContent() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-white! z-50!">
                       <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          onSelect={() => router.push(`/admin/products/${product._id}/edit`)}
+                        >
+                          <Pencil />
+                          Edit
+                        </DropdownMenuItem>
                         {product.status === ProductStatus.VISIBLE && (
                           <DropdownMenuItem
                             onSelect={() => setHideTarget({ id: product._id, name: product.name })}
