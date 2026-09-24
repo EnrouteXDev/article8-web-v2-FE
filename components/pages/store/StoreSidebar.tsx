@@ -6,10 +6,10 @@ import type { ProductFilters } from "@/lib/types";
 import { ProductAvailability } from "@/lib/types";
 
 const PRICE_RANGES = [
-  { label: "Under £5", min: 0, max: 5 },
-  { label: "£5 – £20", min: 5, max: 20 },
-  { label: "£20 – £40", min: 20, max: 40 },
-  { label: "£40+", min: 40, max: undefined },
+  { label: "Under $5", min: 0, max: 5 },
+  { label: "$5 – $20", min: 5, max: 20 },
+  { label: "$20 – $40", min: 20, max: 40 },
+  { label: "$40+", min: 40, max: undefined },
 ];
 
 interface FilterSectionProps {

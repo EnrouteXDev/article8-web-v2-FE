@@ -53,7 +53,7 @@ function mapTicket(t: SupportTicket): Ticket {
             name: t.product.name,
             image: t.product.images?.[0] ?? "/artifact1.jpeg",
             qty: 1,
-            amount: `£${t.product.price.toFixed(2)}`,
+            amount: `$${t.product.price.toFixed(2)}`,
           },
         ]
       : [],

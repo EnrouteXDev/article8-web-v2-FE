@@ -204,7 +204,7 @@ export default function DashboardPageContent() {
                 </div>
               </div>
               <div className="flex flex-col items-end gap-1 shrink-0">
-                <span className="text-sm font-semibold text-gray-800">£{product.price.toFixed(2)}</span>
+                <span className="text-sm font-semibold text-gray-800">${product.price.toFixed(2)}</span>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
@@ -361,7 +361,7 @@ export default function DashboardPageContent() {
                   })}
                 </td>
                 <td className="py-3.5 pr-6 text-sm text-gray-800 font-medium">
-                  £{product.price.toFixed(2)}
+                  ${product.price.toFixed(2)}
                 </td>
                 <td className="py-3.5">
                   <DropdownMenu>

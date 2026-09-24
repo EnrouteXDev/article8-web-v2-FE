@@ -115,7 +115,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               {product.name}
             </h4>
             <span className="font-baloo font-bold text-primary text-[17px]">
-              £{product.price.toFixed(2)}
+              ${product.price.toFixed(2)}
             </span>
           </div>
 

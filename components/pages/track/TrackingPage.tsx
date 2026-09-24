@@ -298,7 +298,7 @@ export default function TrackingPage() {
                       x{item.quantity}
                     </td>
                     <td className="px-5 py-3 font-satoshi text-sm font-semibold text-primary text-right">
-                      £{(item.priceGBP * item.quantity).toFixed(2)}
+                      ${(item.priceGBP * item.quantity).toFixed(2)}
                     </td>
                   </tr>
                 ))}
@@ -318,7 +318,7 @@ export default function TrackingPage() {
                   <p className="font-satoshi text-xs text-primary/50">x{item.quantity}</p>
                 </div>
                 <p className="font-satoshi text-sm font-semibold text-primary shrink-0">
-                  £{(item.priceGBP * item.quantity).toFixed(2)}
+                  ${(item.priceGBP * item.quantity).toFixed(2)}
                 </p>
               </div>
             ))}
@@ -331,7 +331,7 @@ export default function TrackingPage() {
               className="font-bold text-primary text-base"
               style={{ fontFamily: "var(--font-baloo-2)" }}
             >
-              £{subtotal.toFixed(2)}
+              ${subtotal.toFixed(2)}
             </span>
           </div>
         </div>

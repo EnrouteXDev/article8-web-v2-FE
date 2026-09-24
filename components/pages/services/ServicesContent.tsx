@@ -26,7 +26,7 @@ const services: ServiceItem[] = [
     image: "/onedrive_4/Skyfall title.mp4",
     mediaType: "video",
     subServices: [
-      { title: "2D Explainer Videos", description: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling." },
+      { title: "2D Explainer Videos" },
       { title: "Character Animation & Rigging" },
       { title: "Motion Graphics & Infographics" },
       { title: "VFX & Compositing" }
@@ -35,39 +35,39 @@ const services: ServiceItem[] = [
   {
     id: "02",
     title: "3D Modelling, Visualization & Interactive Media",
-    subtitle: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling.",
+    subtitle: "Creating immersive 3D worlds and realistic visualizations that captivate your audience.",
     image: "/3dmodeling.mp4",
     mediaType: "video",
     subServices: [
-      { title: "2D Explainer Videos", description: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling." },
-      { title: "Character Animation & Rigging" },
-      { title: "Motion Graphics & Infographics" },
-      { title: "VFX & Compositing" }
+      { title: "Product Visualization" },
+      { title: "Architectural Visualization" },
+      { title: "Interactive 3D Experiences" },
+      { title: "Game Assets" }
     ]
   },
   {
     id: "03",
     title: "Creative Development & Branding",
-    subtitle: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling.",
+    subtitle: "Building strong, memorable brands through strategic creative development and visual design.",
     image: "/demo.jpg",
     subServices: [
-      { title: "2D Explainer Videos", description: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling." },
-      { title: "Character Animation & Rigging" },
-      { title: "Motion Graphics & Infographics" },
-      { title: "VFX & Compositing" }
+      { title: "Brand Identity" },
+      { title: "Creative Strategy" },
+      { title: "Visual Design" },
+      { title: "Art Direction" }
     ]
   },
   {
     id: "04",
     title: "Film, Audio & Post-Production",
-    subtitle: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling.",
+    subtitle: "Polishing your visual content with professional post-production and high-quality audio services.",
     image: "/onedrive_4/Skyfall title.mp4",
     mediaType: "video",
     subServices: [
-      { title: "2D Explainer Videos", description: "Bringing ideas to life through 2D, 3D, and motion-driven storytelling." },
-      { title: "Character Animation & Rigging" },
-      { title: "Motion Graphics & Infographics" },
-      { title: "VFX & Compositing" }
+      { title: "Video Editing" },
+      { title: "Sound Design" },
+      { title: "Color Grading" },
+      { title: "Voiceover Recording" }
     ]
   }
 ];

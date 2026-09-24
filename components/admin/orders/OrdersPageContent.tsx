@@ -57,7 +57,7 @@ export default function OrdersPageContent() {
   const fmt = (v?: number) => isDashboardLoading ? "…" : v !== undefined ? String(v) : "—";
 
   const stats = [
-    { label: "Total sales",       value: isDashboardLoading ? "…" : m ? `£${m.totalSales.toFixed(2)}` : "—", red: false },
+    { label: "Total sales",       value: isDashboardLoading ? "…" : m ? `$${m.totalSales.toFixed(2)}` : "—", red: false },
     { label: "Total orders",      value: fmt(m?.totalOrders),           red: false },
     { label: "Shipped orders",    value: fmt(m?.totalShippedOrders),    red: false },
     { label: "Processing orders", value: fmt(m?.totalProcessingOrders), red: false },
@@ -129,7 +129,7 @@ export default function OrdersPageContent() {
           ) : (
             orders.map((order) => {
               const badge = statusBadge[order.status] ?? { dot: "bg-gray-400", text: "text-gray-500", bg: "bg-gray-100" };
-              const totalGBP = `£${(order.totalNGN / order.exchangeRate).toFixed(2)}`;
+              const totalUSD = `$${(order.totalNGN / order.exchangeRate).toFixed(2)}`;
               const date = new Date(order.createdAt).toLocaleDateString("en-GB", {
                 day: "2-digit", month: "short", year: "numeric",
               });
@@ -149,7 +149,7 @@ export default function OrdersPageContent() {
                   <p className="text-sm text-gray-700">{order.customer.firstName} {order.customer.lastName}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-400">{date}</span>
-                    <span className="text-sm font-semibold text-gray-800">{totalGBP}</span>
+                    <span className="text-sm font-semibold text-gray-800">{totalUSD}</span>
                   </div>
                 </button>
               );
@@ -187,7 +187,7 @@ export default function OrdersPageContent() {
               orders.map((order, index) => {
                 const badge = statusBadge[order.status] ?? { dot: "bg-gray-400", text: "text-gray-500", bg: "bg-gray-100" };
                 const isSelected = selectedOrder?.orderNumber === order.orderNumber;
-                const totalGBP = `£${(order.totalNGN / order.exchangeRate).toFixed(2)}`;
+                const totalUSD = `$${(order.totalNGN / order.exchangeRate).toFixed(2)}`;
                 const date = new Date(order.createdAt).toLocaleDateString("en-GB", {
                   day: "2-digit", month: "short", year: "numeric",
                 });
@@ -208,7 +208,7 @@ export default function OrdersPageContent() {
                       {order.customer.firstName} {order.customer.lastName}
                     </td>
                     <td className="py-4 pr-4 text-sm text-gray-500">{order.customer.email}</td>
-                    <td className="py-4 pr-4 text-sm font-medium text-gray-800">{totalGBP}</td>
+                    <td className="py-4 pr-4 text-sm font-medium text-gray-800">{totalUSD}</td>
                     <td className="py-4 pr-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${badge.bg} ${badge.text}`}>
                         <span className={`size-1.5 rounded-full shrink-0 ${badge.dot}`} />

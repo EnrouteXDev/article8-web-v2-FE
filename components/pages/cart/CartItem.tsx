@@ -65,7 +65,7 @@ export default function CartItem({ item }: CartItemProps) {
               {product.name}
             </h3>
             <span className="font-satoshi font-bold text-2xl sm:text-[32px] text-primary block mt-1 sm:mt-2">
-              £{product.price.toFixed(2)}
+              ${product.price.toFixed(2)}
             </span>
           </div>
 
