@@ -9,19 +9,19 @@ const MOCK_CART_ITEMS = [
   {
     id: "1",
     name: "Article 8 shirt",
-    price: "£4.99",
+    price: "$4.99",
     image: "/demo.jpg",
   },
   {
     id: "2",
     name: "Article 8 shirt",
-    price: "£4.99",
+    price: "$4.99",
     image: "/demo.jpg",
   },
   {
     id: "3",
     name: "Article 8 shirt",
-    price: "£4.99",
+    price: "$4.99",
     image: "/demo.jpg",
   },
 ];

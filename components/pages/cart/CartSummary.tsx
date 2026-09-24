@@ -33,7 +33,7 @@ export default function CartSummary({
   const subtotal =
     cart?.items?.reduce((sum, item) => sum + item.product.price * item.quantity, 0) ?? 0;
 
-  const formatted = `£${subtotal.toFixed(2)}`;
+  const formatted = `$${subtotal.toFixed(2)}`;
 
   return (
     <div

@@ -243,7 +243,7 @@ export default function ProductDetailContent({ id }: Props) {
 
                   {/* Price */}
                   <p className="font-baloo font-bold text-primary text-3xl">
-                    £{product.price.toFixed(2)}
+                    ${product.price.toFixed(2)}
                   </p>
 
                   {/* Rating + location */}

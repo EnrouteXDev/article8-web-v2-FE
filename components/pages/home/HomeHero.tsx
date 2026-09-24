@@ -242,7 +242,8 @@ export default function HomeHero() {
                   draggable={false}
                 />
               ))}
-              <div className="absolute inset-0 bg-black/50" />
+              {/* Dark overlay only for slides that render text over the artwork */}
+              {!slide.hideText && <div className="absolute inset-0 bg-black/50" />}
             </motion.div>
           )}
         </AnimatePresence>
@@ -262,7 +263,12 @@ export default function HomeHero() {
               >
                 {/* Index */}
                 <motion.div variants={fadeUpVariants} custom={0}>
-                  <span className="font-satoshi font-normal text-[48px] md:text-[80px] lg:text-[96px] text-white leading-none block opacity-80">
+                  <span
+                    className={`font-satoshi font-normal text-[48px] md:text-[80px] lg:text-[96px] text-white leading-none block ${
+                      slide.hideText ? "opacity-100" : "opacity-80"
+                    }`}
+                    style={{ textShadow: "0 4px 16px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.5)" }}
+                  >
                     {slide.index}
                   </span>
                 </motion.div>

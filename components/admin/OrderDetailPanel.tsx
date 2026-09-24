@@ -29,8 +29,8 @@ function formatDate(iso: string) {
   });
 }
 
-function formatGBP(ngn: number, rate: number) {
-  return `£${(ngn / rate).toFixed(2)}`;
+function formatUSD(ngn: number, rate: number) {
+  return `$${(ngn / rate).toFixed(2)}`;
 }
 
 const statusBadge: Record<OrderStatus, { dot: string; text: string; bg: string }> = {
@@ -191,9 +191,9 @@ export default function OrderDetailPanel({
 
             <div className="flex flex-col gap-2 md:min-w-48">
               {[
-                { label: "Order Amount",    value: formatGBP(subtotalNGN, exchangeRate) },
-                { label: "Coupon Discount", value: discountNGN > 0 ? `-${formatGBP(discountNGN, exchangeRate)}` : "—" },
-                { label: "Shipping Fee",    value: order.shippingCostGBP ? `£${order.shippingCostGBP.toFixed(2)}` : formatGBP(shippingCostNGN, exchangeRate) },
+                { label: "Order Amount",    value: formatUSD(subtotalNGN, exchangeRate) },
+                { label: "Coupon Discount", value: discountNGN > 0 ? `-${formatUSD(discountNGN, exchangeRate)}` : "—" },
+                { label: "Shipping Fee",    value: order.shippingCostGBP ? `$${order.shippingCostGBP.toFixed(2)}` : formatUSD(shippingCostNGN, exchangeRate) },
               ].map(({ label, value }) => (
                 <div key={label} className="flex justify-between gap-6">
                   <span className="text-sm text-gray-400">{label}</span>
@@ -202,7 +202,7 @@ export default function OrderDetailPanel({
               ))}
               <div className="border-t border-gray-100 pt-2 flex justify-between gap-6">
                 <span className="text-sm text-gray-400">Total</span>
-                <span className="text-sm font-bold text-primary">{formatGBP(totalNGN, exchangeRate)}</span>
+                <span className="text-sm font-bold text-primary">{formatUSD(totalNGN, exchangeRate)}</span>
               </div>
             </div>
           </div>
@@ -286,9 +286,9 @@ export default function OrderDetailPanel({
                   <tr key={i} className={i !== items.length - 1 ? "border-b border-gray-50" : ""}>
                     <td className="py-3 pr-4 text-sm text-gray-800">{item.name}</td>
                     <td className="py-3 pr-4 text-sm text-gray-500">x{item.quantity}</td>
-                    <td className="py-3 pr-4 text-sm text-gray-500">£{item.priceGBP.toFixed(2)}</td>
+                    <td className="py-3 pr-4 text-sm text-gray-500">${item.priceGBP.toFixed(2)}</td>
                     <td className="py-3 text-sm font-medium text-gray-800">
-                      £{(item.priceGBP * item.quantity).toFixed(2)}
+                      ${(item.priceGBP * item.quantity).toFixed(2)}
                     </td>
                   </tr>
                 ))}

@@ -25,20 +25,20 @@ const galleryPost = (file: string, title: string, tags: string[]): MediaPost => 
 });
 
 const characterPosts: MediaPost[] = [
-  ["Abatan.jpg", "Abatan"],
-  ["Abioye.jpg", "Abioye"],
-  ["Adesua.jpg", "Adesua"],
-  ["Ashabi_cycles_01.jpg", "Ashabi Cycles"],
+  ["Abatan.jpg", "Chief Abatan"],
+  ["Abioye.jpg", "High Chief Shogbola"],
+  ["Adesua.jpg", "Dame Adesua"],
+  ["Ashabi_cycles_01.jpg", "Ashabi"],
   ["Babatunde.jpg", "Babatunde"],
-  ["Efunrewa_02.jpg", "Efunrewa"],
+  ["Efunrewa_02.jpg", "Chief Mrs Efunrewa"],
   ["Oba abioye_Agbada_01.jpg", "Oba Abioye"],
-  ["Olumide_01.jpg", "Olumide"],
+  ["Olumide_01.jpg", "Chief Olumide"],
 ].map(([file, title]) => galleryPost(file, title, ["Character"]));
 
 const environmentPosts: MediaPost[] = [
-  ["Palace interior.jpg", "Palace Interior"],
-  ["SENTENCING_HALL_02.jpg", "Sentencing Hall"],
-  ["The core.jpg", "The Core"],
+  ["Palace interior.jpg", "Council Chambers"],
+  ["SENTENCING_HALL_02.jpg", "Grand Council Chambers"],
+  ["The core.jpg", "The Core Chamber"],
 ].map(([file, title]) => galleryPost(file, title, ["Environment"]));
 
 const categories: GalleryCategory[] = [

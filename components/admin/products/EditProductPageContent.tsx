@@ -138,7 +138,7 @@ export default function EditProductPageContent({ id }: Props) {
   const isBusy = isUploading || isPending;
 
   const displayName = name || "Product Name";
-  const displayPrice = price ? `£${price}` : "£0.00";
+  const displayPrice = price ? `$${price}` : "$0.00";
   const displayQty = quantity ? parseInt(quantity, 10) : 0;
   const previewImages = [...existingImages, ...newImagePreviews];
 
@@ -215,7 +215,7 @@ export default function EditProductPageContent({ id }: Props) {
             <label className="text-sm font-medium text-gray-700">Price</label>
             <input
               type="text"
-              placeholder="£0.00"
+              placeholder="$0.00"
               disabled={isBusy}
               className="h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-gray-400 transition-colors disabled:opacity-50"
               {...register("price")}
