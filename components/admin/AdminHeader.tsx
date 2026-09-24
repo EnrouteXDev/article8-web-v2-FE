@@ -9,6 +9,8 @@ const pageTitles: Record<string, string> = {
   "/admin/products/create": "Create Product",
   "/admin/products/category": "Products",
   "/admin/products/category/create": "Products",
+  "/admin/hero": "Hero Slider",
+  "/admin/hero/create": "Hero Slider",
   "/admin/orders": "Orders",
   "/admin/reviews": "Reviews",
   "/admin/support": "Customer Support",
@@ -22,7 +24,13 @@ interface AdminHeaderProps {
 
 export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   const pathname = usePathname();
-  const title = pageTitles[pathname] ?? "Dashboard";
+  const title =
+    pageTitles[pathname] ??
+    (pathname.startsWith("/admin/hero")
+      ? "Hero Slider"
+      : pathname.startsWith("/admin/products")
+        ? "Products"
+        : "Dashboard");
 
   return (
     <header className="h-14 md:h-16 bg-white border-b border-gray-200 flex items-center shrink-0 px-4">

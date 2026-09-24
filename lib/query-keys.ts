@@ -53,3 +53,11 @@ export const orderKeys = {
   tracking: (orderNumber: string) => [...orderKeys.all, 'tracking', orderNumber] as const,
   dashboard: (page?: number, limit?: number) => [...orderKeys.all, 'dashboard', page, limit] as const,
 }
+
+export const heroSlideKeys = {
+  all: ['hero-slides'] as const,
+  public: () => [...heroSlideKeys.all, 'public'] as const,
+  admin: () => [...heroSlideKeys.all, 'admin'] as const,
+  details: () => [...heroSlideKeys.all, 'detail'] as const,
+  detail: (id: string) => [...heroSlideKeys.details(), id] as const,
+}

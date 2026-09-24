@@ -495,3 +495,58 @@ export interface CreateReviewInput {
   rating: number
   comment: string
 }
+
+// ─── Hero Slides ──────────────────────────────────────────────────────────────
+
+export type HeroButtonVariant = 'solid' | 'outline'
+export type HeroButtonAction = 'link' | 'showreel'
+export type HeroTextAlign = 'left' | 'center'
+
+export interface HeroSlideButton {
+  text: string
+  href?: string
+  variant: HeroButtonVariant
+  action?: HeroButtonAction
+  videoUrl?: string
+}
+
+export interface HeroSlide {
+  _id: string
+  title: string
+  topSubtitle?: string
+  bottomSubtitle?: string
+  image: string
+  mobileImage?: string
+  imageAlt?: string
+  backgroundVideo?: string
+  overlayImages?: string[]
+  hideText?: boolean
+  comingSoon?: boolean
+  textAlign?: HeroTextAlign
+  showOverlay?: boolean
+  overlayOpacity?: number
+  order?: number
+  isActive?: boolean
+  startDate?: string | null
+  endDate?: string | null
+  buttons: HeroSlideButton[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type CreateHeroSlideInput = Omit<HeroSlide, '_id' | 'createdAt' | 'updatedAt'>
+export type UpdateHeroSlideInput = Partial<CreateHeroSlideInput>
+
+export interface HeroSlideResponse {
+  message: string
+  slide: HeroSlide
+}
+
+export interface HeroSlidesResponse {
+  message: string
+  slides: HeroSlide[]
+}
+
+export interface DeleteHeroSlideResponse {
+  message: string
+}
