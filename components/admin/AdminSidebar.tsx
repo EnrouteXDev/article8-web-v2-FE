@@ -10,6 +10,7 @@ import {
   ChevronDown,
   MessageSquareText,
   Settings,
+  Images,
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -22,6 +23,7 @@ const productsSubItems = [
 ];
 
 const navItems = [
+  { href: "/admin/hero", icon: Images, label: "Hero Slider" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
   { href: "/admin/reviews", icon: MessageSquareText, label: "Reviews" },
   { href: "/admin/support", icon: Headphones, label: "Customer Support" },
