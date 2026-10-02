@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import type { Product } from "@/lib/types";
 import { ProductStatus } from "@/lib/types";
 import { useAddToCart, useUpdateCartItem, useRemoveCartItem, useCart } from "@/lib/queries/cart";
+import { getApiErrorMessage } from "@/lib/api/client";
+import { hasSizes } from "@/lib/utils/sizes";
 import { Spinner } from "@/components/ui/spinner";
 
 interface ProductCardProps {
@@ -44,36 +46,50 @@ export default function ProductCard({ product }: ProductCardProps) {
   const stock = getStockLabel(product);
   const outOfStock = product.status === ProductStatus.OUT_OF_STOCK;
 
-  const cartItem = cart?.items?.find((i) => i.product._id === product._id);
+  // Sized products are added from the detail page, where the size is picked
+  const needsSize = hasSizes(product);
+  const productHref = `/store/${product._id}`;
+
+  const cartItem = needsSize
+    ? undefined
+    : cart?.items?.find((i) => i.product._id === product._id);
   const inCart = !!cartItem;
   const isPending = isAdding || isUpdating || isRemoving;
 
   const handleAddToCart = () => {
+    if (needsSize) {
+      router.push(productHref);
+      return;
+    }
     addToCart(
       { productId: product._id, quantity: 1 },
-      { onError: () => toast.error("Failed to add to cart") }
+      { onError: (err) => toast.error(getApiErrorMessage(err, "Failed to add to cart")) }
     );
   };
 
   const handleIncrement = () => {
     updateItem(
-      { productId: product._id, quantity: cartItem!.quantity + 1 },
-      { onError: () => toast.error("Failed to update cart") }
+      { itemId: cartItem!._id, quantity: cartItem!.quantity + 1 },
+      { onError: (err) => toast.error(getApiErrorMessage(err, "Failed to update cart")) }
     );
   };
 
   const handleDecrement = () => {
     if (cartItem!.quantity === 1) {
-      removeItem(product._id, { onError: () => toast.error("Failed to update cart") });
+      removeItem(cartItem!._id, { onError: () => toast.error("Failed to update cart") });
     } else {
       updateItem(
-        { productId: product._id, quantity: cartItem!.quantity - 1 },
-        { onError: () => toast.error("Failed to update cart") }
+        { itemId: cartItem!._id, quantity: cartItem!.quantity - 1 },
+        { onError: (err) => toast.error(getApiErrorMessage(err, "Failed to update cart")) }
       );
     }
   };
 
   const handleBuyNow = () => {
+    if (needsSize) {
+      router.push(productHref);
+      return;
+    }
     if (inCart) {
       router.push("/cart");
       return;
@@ -82,7 +98,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       { productId: product._id, quantity: 1 },
       {
         onSuccess: () => router.push("/cart"),
-        onError: () => toast.error("Failed to add to cart"),
+        onError: (err) => toast.error(getApiErrorMessage(err, "Failed to add to cart")),
       }
     );
   };
@@ -90,7 +106,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* Image Container */}
-      <Link href={`/store/${product._id}`} className="block">
+      <Link href={productHref} className="block">
       <div className="relative w-full aspect-236/244 overflow-hidden group bg-primary/5">
         {image ? (
           <Image
@@ -155,7 +171,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             >
               {isAdding ? <Spinner className="size-3" /> : <ShoppingCart01Icon size={13} />}
               <span className="font-baloo text-sm font-medium whitespace-nowrap">
-                Add to cart
+                {needsSize ? "Select size" : "Add to cart"}
               </span>
             </button>
           )}

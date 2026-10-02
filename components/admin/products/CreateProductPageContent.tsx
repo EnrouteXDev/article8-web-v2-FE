@@ -12,6 +12,14 @@ import { useCreateProduct } from "@/lib/queries/products";
 import { Spinner } from "@/components/ui/spinner";
 import { createProductSchema, type CreateProductFormValues } from "@/lib/schemas";
 import { uploadImages } from "@/lib/utils/cloudinary";
+import ProductSizesField, {
+  buildSizesPayload,
+  emptySizesValue,
+  getSizesError,
+  totalSizeStock,
+  usesPerSizeStock,
+  type ProductSizesValue,
+} from "./ProductSizesField";
 
 export default function CreateProductPageContent() {
   const router = useRouter();
@@ -31,6 +39,17 @@ export default function CreateProductPageContent() {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  const [sizes, setSizes] = useState<ProductSizesValue>(emptySizesValue);
+  const perSizeStock = usesPerSizeStock(sizes);
+
+  // With per-size stock the total quantity is the sum of the sizes
+  const handleSizesChange = (next: ProductSizesValue) => {
+    setSizes(next);
+    if (usesPerSizeStock(next)) {
+      setValue("quantity", String(totalSizeStock(next)), { shouldValidate: true });
+    }
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const addMoreRef = useRef<HTMLInputElement>(null);
@@ -60,6 +79,12 @@ export default function CreateProductPageContent() {
   };
 
   const onSubmit = async (values: CreateProductFormValues) => {
+    const sizesError = getSizesError(sizes);
+    if (sizesError) {
+      toast.error(sizesError);
+      return;
+    }
+
     let imageUrls: string[] = [];
 
     if (imageFiles.length > 0) {
@@ -81,6 +106,7 @@ export default function CreateProductPageContent() {
         quantity: parseInt(values.quantity, 10),
         description: values.description,
         images: imageUrls,
+        ...buildSizesPayload(sizes),
       },
       {
         onSuccess: () => {
@@ -188,6 +214,8 @@ export default function CreateProductPageContent() {
             )}
           </div>
 
+          <ProductSizesField value={sizes} onChange={handleSizesChange} disabled={isBusy} />
+
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-gray-700">
               Quantity available
@@ -196,9 +224,13 @@ export default function CreateProductPageContent() {
               type="number"
               placeholder="0"
               disabled={isPending}
-              className="h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-gray-400 transition-colors disabled:opacity-50"
+              readOnly={perSizeStock}
+              className="h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-gray-400 transition-colors disabled:opacity-50 read-only:bg-gray-50 read-only:text-gray-500"
               {...register("quantity")}
             />
+            {perSizeStock && (
+              <p className="text-xs text-gray-500">Calculated from the stock of each size</p>
+            )}
             {errors.quantity && (
               <p className="text-xs text-red-500">{errors.quantity.message}</p>
             )}

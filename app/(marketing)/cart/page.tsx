@@ -37,7 +37,7 @@ export default function CartPage() {
             <div className="flex-1 min-w-0">
               <div className="flex flex-col divide-y divide-gray-200">
                 {(cart as Cart).items.map((item) => (
-                  <CartItem key={item.product._id} item={item} />
+                  <CartItem key={item._id} item={item} />
                 ))}
               </div>
             </div>

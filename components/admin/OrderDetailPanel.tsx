@@ -284,7 +284,14 @@ export default function OrderDetailPanel({
               <tbody>
                 {items.map((item, i) => (
                   <tr key={i} className={i !== items.length - 1 ? "border-b border-gray-50" : ""}>
-                    <td className="py-3 pr-4 text-sm text-gray-800">{item.name}</td>
+                    <td className="py-3 pr-4 text-sm text-gray-800">
+                      {item.name}
+                      {item.size && (
+                        <span className="ml-2 inline-flex px-1.5 py-0.5 rounded bg-gray-100 text-xs font-semibold text-gray-700">
+                          Size {item.size}
+                        </span>
+                      )}
+                    </td>
                     <td className="py-3 pr-4 text-sm text-gray-500">x{item.quantity}</td>
                     <td className="py-3 pr-4 text-sm text-gray-500">${item.priceGBP.toFixed(2)}</td>
                     <td className="py-3 text-sm font-medium text-gray-800">

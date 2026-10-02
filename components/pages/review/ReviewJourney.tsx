@@ -106,14 +106,16 @@ function ItemsView({
       <div className="flex flex-col gap-3">
         {items.map((item) => (
           <div
-            key={item.product}
+            key={`${item.product}-${item.size ?? ""}`}
             className="flex items-center gap-4 rounded-2xl border border-primary/10 bg-white p-4 shadow-sm"
           >
             <ProductImage productId={item.product} name={item.name} />
 
             <div className="flex-1 min-w-0">
               <p className="font-satoshi font-semibold text-primary truncate">{item.name}</p>
-              <p className="font-satoshi text-primary/50 text-sm">{item.quantity} pcs</p>
+              <p className="font-satoshi text-primary/50 text-sm">
+                {item.quantity} pcs{item.size ? ` · Size ${item.size}` : ""}
+              </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-2 shrink-0">
