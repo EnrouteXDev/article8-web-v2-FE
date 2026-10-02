@@ -37,4 +37,14 @@ client.interceptors.response.use(
   }
 )
 
+// The API sends `message` as a string, or as a string[] for field validation errors
+export function getApiErrorMessage(error: unknown, fallback: string): string {
+  if (axios.isAxiosError(error)) {
+    const message = error.response?.data?.message
+    if (Array.isArray(message)) return message[0] ?? fallback
+    if (typeof message === 'string' && message) return message
+  }
+  return fallback
+}
+
 export { client }

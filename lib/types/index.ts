@@ -53,6 +53,13 @@ export interface Admin {
   updatedAt: string
 }
 
+// `quantity` is only present when stock is tracked per size; otherwise all
+// sizes share the product's single `quantity`.
+export interface ProductSize {
+  label: string
+  quantity?: number
+}
+
 export interface Product {
   _id: string
   name: string
@@ -61,6 +68,8 @@ export interface Product {
   quantity: number
   description: string
   images: string[]
+  sizes?: ProductSize[]
+  hasSizeGuide?: boolean
   status: ProductStatus
   createdAt: string
   updatedAt: string
@@ -105,6 +114,10 @@ export interface UpdateAdminRoleInput {
   role: AdminRole
 }
 
+// Sizes are sent either as plain labels (shared stock) or as
+// { label, quantity } for per-size stock — never a mix of the two.
+export type ProductSizesInput = string[] | Required<ProductSize>[]
+
 export interface CreateProductInput {
   name: string
   url: string
@@ -112,6 +125,8 @@ export interface CreateProductInput {
   quantity: number
   description: string
   images?: string[]
+  sizes?: ProductSizesInput
+  hasSizeGuide?: boolean
 }
 
 export interface UpdateProductInput {
@@ -121,6 +136,8 @@ export interface UpdateProductInput {
   quantity: number
   description: string
   images: string[]
+  sizes?: ProductSizesInput
+  hasSizeGuide?: boolean
 }
 
 export interface ProductFilters {
@@ -216,8 +233,10 @@ export interface DeleteCategoryResponse {
 // ─── Cart ─────────────────────────────────────────────────────────────────────
 
 export interface CartItem {
+  _id: string
   product: Product
   quantity: number
+  size?: string
 }
 
 export interface Cart {
@@ -237,6 +256,8 @@ export interface CartResponse {
 export interface AddToCartInput {
   productId: string
   quantity: number
+  size?: string
+  sessionId?: string
 }
 
 export interface ForgotPasswordInput {
@@ -290,6 +311,7 @@ export interface OrderCustomer {
 export interface OrderItem {
   product: string
   name: string
+  size?: string
   quantity: number
   priceGBP: number
   priceNGN: number

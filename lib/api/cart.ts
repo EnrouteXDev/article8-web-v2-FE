@@ -13,11 +13,11 @@ export async function getCart(sessionId: string): Promise<CartResponse> {
 
 export async function updateCartItem(
   sessionId: string,
-  productId: string,
+  itemId: string,
   quantity: number,
 ): Promise<CartResponse> {
   const response = await client.patch<CartResponse>(
-    `/cart/${sessionId}/item/${productId}`,
+    `/cart/${sessionId}/item/${itemId}`,
     { quantity },
   )
   return response.data
@@ -25,10 +25,10 @@ export async function updateCartItem(
 
 export async function removeCartItem(
   sessionId: string,
-  productId: string,
+  itemId: string,
 ): Promise<CartResponse> {
   const response = await client.delete<CartResponse>(
-    `/cart/${sessionId}/item/${productId}`,
+    `/cart/${sessionId}/item/${itemId}`,
   )
   return response.data
 }

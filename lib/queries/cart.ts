@@ -9,7 +9,7 @@ import {
 } from '@/lib/api/cart'
 import { useCartStore } from '@/lib/stores/cart'
 import { cartKeys } from '@/lib/query-keys'
-import type { AddToCartInput, Cart, CartResponse } from '@/lib/types'
+import type { AddToCartInput, Cart } from '@/lib/types'
 
 // ─── Fetch cart ───────────────────────────────────────────────────────────────
 
@@ -26,8 +26,9 @@ export function useCart() {
 }
 
 // ─── Add to cart ──────────────────────────────────────────────────────────────
-// First add → POST /cart (server creates session)
-// Subsequent adds → PATCH /cart/:sessionId/item/:productId (increment qty)
+// POST /cart — the server creates the session on the first add and reuses it
+// when sessionId is sent. A product + size that is already in the cart has its
+// quantity incremented; a different size becomes its own cart line.
 
 export function useAddToCart() {
   const queryClient = useQueryClient()
@@ -35,24 +36,10 @@ export function useAddToCart() {
   const setSessionId = useCartStore((s) => s.setSessionId)
 
   return useMutation({
-    mutationFn: async ({ productId, quantity }: AddToCartInput) => {
-      if (!sessionId) {
-        return addToCart({ productId, quantity })
-      }
-
-      // Get current cart from cache to know existing qty
-      const cached = queryClient.getQueryData<CartResponse>(
-        cartKeys.session(sessionId),
-      )
-      const existing = cached?.cart?.items?.find(
-        (item) => item.product._id === productId,
-      )
-      const newQty = existing ? existing.quantity + quantity : quantity
-
-      return updateCartItem(sessionId, productId, newQty)
-    },
+    mutationFn: ({ productId, quantity, size }: Omit<AddToCartInput, 'sessionId'>) =>
+      addToCart({ productId, quantity, size, sessionId: sessionId ?? undefined }),
     onSuccess: (data) => {
-      // First-time add returns sessionId — persist it
+      // The add response returns sessionId — persist it
       if (data.sessionId) {
         setSessionId(data.sessionId)
       }
@@ -65,6 +52,8 @@ export function useAddToCart() {
 }
 
 // ─── Update item quantity ─────────────────────────────────────────────────────
+// Lines are addressed by cart item _id, since one product can be in the cart
+// in several sizes.
 
 export function useUpdateCartItem() {
   const queryClient = useQueryClient()
@@ -72,12 +61,12 @@ export function useUpdateCartItem() {
 
   return useMutation({
     mutationFn: ({
-      productId,
+      itemId,
       quantity,
     }: {
-      productId: string
+      itemId: string
       quantity: number
-    }) => updateCartItem(sessionId!, productId, quantity),
+    }) => updateCartItem(sessionId!, itemId, quantity),
     onSuccess: (data) => {
       if (sessionId) {
         queryClient.setQueryData(cartKeys.session(sessionId), data)
@@ -93,7 +82,7 @@ export function useRemoveCartItem() {
   const sessionId = useCartStore((s) => s.sessionId)
 
   return useMutation({
-    mutationFn: (productId: string) => removeCartItem(sessionId!, productId),
+    mutationFn: (itemId: string) => removeCartItem(sessionId!, itemId),
     onSuccess: (data) => {
       if (sessionId) {
         queryClient.setQueryData(cartKeys.session(sessionId), data)

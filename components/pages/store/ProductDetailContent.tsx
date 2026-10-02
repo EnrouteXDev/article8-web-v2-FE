@@ -22,9 +22,12 @@ import { useAddToCart, useCart, useUpdateCartItem, useRemoveCartItem } from "@/l
 import { useProductReviews } from "@/lib/queries/reviews";
 import { Spinner } from "@/components/ui/spinner";
 import { ProductStatus } from "@/lib/types";
+import { getApiErrorMessage } from "@/lib/api/client";
+import { getSizeStock } from "@/lib/utils/sizes";
 import ProductReviews from "./ProductReviews";
 import ProductPolicies from "./ProductPolicies";
 import SimilarProducts from "./SimilarProducts";
+import SizeGuide from "./SizeGuide";
 
 function ProductDetailSkeleton() {
   return (
@@ -81,15 +84,39 @@ export default function ProductDetailContent({ id }: Props) {
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [localQty, setLocalQty] = useState(1);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [sizeError, setSizeError] = useState(false);
 
   const product = data?.product;
   const validImages = (product?.images ?? []).filter(isValidImageSrc);
   const similarProducts = (similarData?.data ?? []).filter((p) => p._id !== id);
 
+  const sizes = product?.sizes ?? [];
+  const hasSizes = sizes.length > 0;
+  // Stock for the selected size (or the whole product when no size applies)
+  const availableStock = product ? getSizeStock(product, selectedSize) : 0;
+
   const isOutOfStock = product?.status === ProductStatus.OUT_OF_STOCK;
-  const cartItem = cart?.items?.find((i) => i.product._id === id);
+  // Each size is its own cart line, so match on the selected size too
+  const cartItem = cart?.items?.find(
+    (i) => i.product._id === id && (!hasSizes || i.size === selectedSize)
+  );
   const inCart = !!cartItem;
   const isPending = isAdding || isUpdating || isRemoving;
+
+  const selectSize = (label: string) => {
+    setSelectedSize(label);
+    setSizeError(false);
+    setLocalQty(1);
+  };
+
+  // Sized products can't be added until a size is picked
+  const requireSize = () => {
+    if (!hasSizes || selectedSize) return true;
+    setSizeError(true);
+    toast.error("Please select a size");
+    return false;
+  };
 
   const prevImage = () => {
     if (!validImages.length) return;
@@ -267,10 +294,46 @@ export default function ProductDetailContent({ id }: Props) {
                     {product.description}
                   </p>
 
+                  {/* Size selector */}
+                  {hasSizes && (
+                    <div className="flex flex-col gap-2">
+                      <p className="font-satoshi text-sm font-medium text-primary">
+                        Size{selectedSize ? `: ${selectedSize}` : ""}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {sizes.map((size) => {
+                          const soldOut = isOutOfStock || getSizeStock(product, size.label) <= 0;
+                          const selected = selectedSize === size.label;
+                          return (
+                            <button
+                              key={size.label}
+                              type="button"
+                              disabled={soldOut}
+                              aria-pressed={selected}
+                              onClick={() => selectSize(size.label)}
+                              className={`min-w-11 h-11 px-3 rounded-lg border font-satoshi text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:line-through ${
+                                selected
+                                  ? "bg-primary border-primary text-white"
+                                  : "border-primary/20 text-primary hover:bg-primary/5"
+                              }`}
+                            >
+                              {size.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {sizeError && (
+                        <p className="font-satoshi text-sm text-[#A20505]">Please select a size</p>
+                      )}
+                    </div>
+                  )}
+
+                  {product.hasSizeGuide && <SizeGuide />}
+
                   {/* Stock count */}
-                  {!isOutOfStock && product.quantity <= 10 && (
+                  {!isOutOfStock && availableStock <= 10 && (
                     <p className="font-satoshi text-sm text-[#A20505] font-medium">
-                      Only {product.quantity} left in stock
+                      Only {availableStock} left in stock
                     </p>
                   )}
 
@@ -283,11 +346,11 @@ export default function ProductDetailContent({ id }: Props) {
                           disabled={isPending}
                           onClick={() => {
                             if (cartItem!.quantity === 1) {
-                              removeItem(product._id, { onError: () => toast.error("Failed to update cart") });
+                              removeItem(cartItem!._id, { onError: () => toast.error("Failed to update cart") });
                             } else {
                               updateItem(
-                                { productId: product._id, quantity: cartItem!.quantity - 1 },
-                                { onError: () => toast.error("Failed to update cart") }
+                                { itemId: cartItem!._id, quantity: cartItem!.quantity - 1 },
+                                { onError: (err) => toast.error(getApiErrorMessage(err, "Failed to update cart")) }
                               );
                             }
                           }}
@@ -299,11 +362,11 @@ export default function ProductDetailContent({ id }: Props) {
                           {isUpdating ? <Spinner className="size-3 mx-auto" /> : cartItem!.quantity}
                         </span>
                         <button
-                          disabled={isPending}
+                          disabled={isPending || cartItem!.quantity >= availableStock}
                           onClick={() =>
                             updateItem(
-                              { productId: product._id, quantity: cartItem!.quantity + 1 },
-                              { onError: () => toast.error("Failed to update cart") }
+                              { itemId: cartItem!._id, quantity: cartItem!.quantity + 1 },
+                              { onError: (err) => toast.error(getApiErrorMessage(err, "Failed to update cart")) }
                             )
                           }
                           className="w-10 h-11 flex items-center justify-center text-primary hover:bg-primary/5 transition-colors disabled:opacity-40"
@@ -324,7 +387,7 @@ export default function ProductDetailContent({ id }: Props) {
                           {localQty}
                         </span>
                         <button
-                          onClick={() => setLocalQty((q) => Math.min(product.quantity, q + 1))}
+                          onClick={() => setLocalQty((q) => Math.min(availableStock, q + 1))}
                           disabled={isOutOfStock}
                           className="w-10 h-11 flex items-center justify-center text-primary hover:bg-primary/5 transition-colors disabled:opacity-40"
                         >
@@ -344,12 +407,13 @@ export default function ProductDetailContent({ id }: Props) {
                     ) : (
                       <button
                         disabled={isOutOfStock || isAdding}
-                        onClick={() =>
+                        onClick={() => {
+                          if (!requireSize()) return;
                           addToCart(
-                            { productId: product._id, quantity: localQty },
-                            { onError: () => toast.error("Failed to add to cart") }
-                          )
-                        }
+                            { productId: product._id, quantity: localQty, size: selectedSize ?? undefined },
+                            { onError: (err) => toast.error(getApiErrorMessage(err, "Failed to add to cart")) }
+                          );
+                        }}
                         className="flex-1 h-11 flex items-center justify-center gap-2 border border-primary/20 rounded-lg text-primary font-satoshi text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         {isAdding ? <Spinner className="size-4" /> : <ShoppingCart01Icon size={18} />}
@@ -366,9 +430,13 @@ export default function ProductDetailContent({ id }: Props) {
                         router.push("/cart");
                         return;
                       }
+                      if (!requireSize()) return;
                       addToCart(
-                        { productId: product._id, quantity: localQty },
-                        { onSuccess: () => router.push("/cart") }
+                        { productId: product._id, quantity: localQty, size: selectedSize ?? undefined },
+                        {
+                          onSuccess: () => router.push("/cart"),
+                          onError: (err) => toast.error(getApiErrorMessage(err, "Failed to add to cart")),
+                        }
                       );
                     }}
                     className="w-full h-12 bg-primary text-white font-baloo font-bold text-base rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"

@@ -3,7 +3,10 @@
 import Image from "next/image";
 import { Delete02Icon } from "hugeicons-react";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 import { useUpdateCartItem, useRemoveCartItem } from "@/lib/queries/cart";
+import { getApiErrorMessage } from "@/lib/api/client";
+import { getSizeStock } from "@/lib/utils/sizes";
 import type { CartItem as CartItemType } from "@/lib/types";
 
 interface CartItemProps {
@@ -22,24 +25,30 @@ function isValidImageSrc(src: string | undefined): src is string {
 }
 
 export default function CartItem({ item }: CartItemProps) {
-  const { product, quantity } = item;
+  const { product, quantity, size } = item;
+  const stock = getSizeStock(product, size);
   const image = isValidImageSrc(product.images?.[0]) ? product.images[0] : undefined;
   const { mutate: updateItem, isPending: isUpdating } = useUpdateCartItem();
   const { mutate: removeItem, isPending: isRemoving } = useRemoveCartItem();
 
   const isPending = isUpdating || isRemoving;
 
+  const onUpdateError = (err: unknown) =>
+    toast.error(getApiErrorMessage(err, "Failed to update cart"));
+
+  const remove = () => removeItem(item._id, { onError: onUpdateError });
+
   const decrement = () => {
     if (quantity === 1) {
-      removeItem(product._id);
+      remove();
     } else {
-      updateItem({ productId: product._id, quantity: quantity - 1 });
+      updateItem({ itemId: item._id, quantity: quantity - 1 }, { onError: onUpdateError });
     }
   };
 
   const increment = () => {
-    if (quantity >= product.quantity) return;
-    updateItem({ productId: product._id, quantity: quantity + 1 });
+    if (quantity >= stock) return;
+    updateItem({ itemId: item._id, quantity: quantity + 1 }, { onError: onUpdateError });
   };
 
   return (
@@ -64,6 +73,11 @@ export default function CartItem({ item }: CartItemProps) {
             <h3 className="font-satoshi font-medium text-lg sm:text-2xl text-primary leading-tight">
               {product.name}
             </h3>
+            {size && (
+              <p className="font-satoshi text-sm sm:text-base text-primary/60 mt-1">
+                Size: <span className="font-medium text-primary">{size}</span>
+              </p>
+            )}
             <span className="font-satoshi font-bold text-2xl sm:text-[32px] text-primary block mt-1 sm:mt-2">
               ${product.price.toFixed(2)}
             </span>
@@ -84,14 +98,14 @@ export default function CartItem({ item }: CartItemProps) {
               </span>
               <button
                 onClick={increment}
-                disabled={isPending || quantity >= product.quantity}
+                disabled={isPending || quantity >= stock}
                 className="w-7.5 h-7.5 flex items-center justify-center border border-[#E5E5E5] rounded-sm hover:bg-gray-50 transition-colors disabled:opacity-40"
               >
                 +
               </button>
             </div>
             <button
-              onClick={() => removeItem(product._id)}
+              onClick={remove}
               disabled={isPending}
               className="flex items-center gap-1 text-primary hover:opacity-80 transition-opacity disabled:opacity-40"
             >
@@ -123,14 +137,14 @@ export default function CartItem({ item }: CartItemProps) {
           </span>
           <button
             onClick={increment}
-            disabled={isPending || quantity >= product.quantity}
+            disabled={isPending || quantity >= stock}
             className="w-[35px] h-[35px] flex items-center justify-center border border-[#E5E5E5] rounded-sm hover:bg-gray-50 transition-colors disabled:opacity-40"
           >
             +
           </button>
         </div>
         <button
-          onClick={() => removeItem(product._id)}
+          onClick={remove}
           disabled={isPending}
           className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity disabled:opacity-40"
         >

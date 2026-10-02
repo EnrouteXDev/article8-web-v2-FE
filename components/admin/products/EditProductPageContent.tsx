@@ -12,6 +12,15 @@ import { useProduct, useUpdateProduct } from "@/lib/queries/products";
 import { Spinner } from "@/components/ui/spinner";
 import { editProductSchema, type EditProductFormValues } from "@/lib/schemas";
 import { uploadImages } from "@/lib/utils/cloudinary";
+import ProductSizesField, {
+  buildSizesPayload,
+  emptySizesValue,
+  sizesValueFromProduct,
+  getSizesError,
+  totalSizeStock,
+  usesPerSizeStock,
+  type ProductSizesValue,
+} from "./ProductSizesField";
 
 interface Props {
   id: string;
@@ -42,6 +51,17 @@ export default function EditProductPageContent({ id }: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
+  const [sizes, setSizes] = useState<ProductSizesValue>(emptySizesValue);
+  const perSizeStock = usesPerSizeStock(sizes);
+
+  // With per-size stock the total quantity is the sum of the sizes
+  const handleSizesChange = (next: ProductSizesValue) => {
+    setSizes(next);
+    if (usesPerSizeStock(next)) {
+      setValue("quantity", String(totalSizeStock(next)), { shouldValidate: true });
+    }
+  };
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const addMoreRef = useRef<HTMLInputElement>(null);
 
@@ -61,6 +81,7 @@ export default function EditProductPageContent({ id }: Props) {
       description: p.description,
     });
     setExistingImages(p.images ?? []);
+    setSizes(sizesValueFromProduct(p));
   }, [data, reset]);
 
   const name = watch("name");
@@ -96,6 +117,12 @@ export default function EditProductPageContent({ id }: Props) {
   const totalImages = existingImages.length + newImagePreviews.length;
 
   const onSubmit = async (values: EditProductFormValues) => {
+    const sizesError = getSizesError(sizes);
+    if (sizesError) {
+      toast.error(sizesError);
+      return;
+    }
+
     let uploadedUrls: string[] = [];
 
     if (newImageFiles.length > 0) {
@@ -119,6 +146,7 @@ export default function EditProductPageContent({ id }: Props) {
           quantity: parseInt(values.quantity, 10),
           description: values.description,
           images: [...existingImages, ...uploadedUrls],
+          ...buildSizesPayload(sizes),
         },
       },
       {
@@ -223,15 +251,21 @@ export default function EditProductPageContent({ id }: Props) {
             {errors.price && <p className="text-xs text-red-500">{errors.price.message}</p>}
           </div>
 
+          <ProductSizesField value={sizes} onChange={handleSizesChange} disabled={isBusy} />
+
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-gray-700">Quantity available</label>
             <input
               type="number"
               placeholder="0"
               disabled={isBusy}
-              className="h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-gray-400 transition-colors disabled:opacity-50"
+              readOnly={perSizeStock}
+              className="h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-gray-400 transition-colors disabled:opacity-50 read-only:bg-gray-50 read-only:text-gray-500"
               {...register("quantity")}
             />
+            {perSizeStock && (
+              <p className="text-xs text-gray-500">Calculated from the stock of each size</p>
+            )}
             {errors.quantity && <p className="text-xs text-red-500">{errors.quantity.message}</p>}
           </div>
 
